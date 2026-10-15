@@ -1,0 +1,171 @@
+{
+  "dataset": "Kaggle / UCI Household Electric Power Consumption",
+  "source_url": "https://www.kaggle.com/datasets/uciml/electric-power-consumption-data-set",
+  "statistics": {
+    "raw_rows": 2075259,
+    "missing_power_readings": 25979,
+    "daily_rows": 1440,
+    "imputed_days": 22,
+    "minimum_daily_coverage": 0.9,
+    "start": "2006-12-17",
+    "end": "2010-11-25",
+    "mean_daily_kwh": 26.09,
+    "min_daily_kwh": 4.172,
+    "max_daily_kwh": 79.556
+  },
+  "features": [
+    "lag_1",
+    "lag_7",
+    "lag_14",
+    "mean_7",
+    "mean_28",
+    "std_7",
+    "weekday_sin",
+    "weekday_cos",
+    "month_sin",
+    "month_cos"
+  ],
+  "selected_model": "Gradient Boosting",
+  "split": {
+    "train_end": "2009-09-27",
+    "validation_end": "2010-04-27",
+    "test_start": "2010-04-28",
+    "test_end": "2010-11-25",
+    "observed_train_rows": 981,
+    "observed_validation_rows": 207,
+    "observed_test_rows": 202
+  },
+  "baseline": {
+    "name": "Previous day",
+    "test": {
+      "mae": 4.5636,
+      "rmse": 6.5253,
+      "r2": 0.203
+    }
+  },
+  "models": [
+    {
+      "name": "Linear Regression",
+      "validation_before": {
+        "mae": 4.8473,
+        "rmse": 6.375,
+        "r2": 0.1984
+      },
+      "validation_after": {
+        "mae": 4.8473,
+        "rmse": 6.375,
+        "r2": 0.1984
+      },
+      "tuned_params": {},
+      "using_tuned": true,
+      "validation_selected": {
+        "mae": 4.8473,
+        "rmse": 6.375,
+        "r2": 0.1984
+      },
+      "test": {
+        "mae": 4.199,
+        "rmse": 5.4665,
+        "r2": 0.4406
+      }
+    },
+    {
+      "name": "Random Forest",
+      "validation_before": {
+        "mae": 4.6366,
+        "rmse": 6.1147,
+        "r2": 0.2626
+      },
+      "validation_after": {
+        "mae": 4.5948,
+        "rmse": 6.1154,
+        "r2": 0.2624
+      },
+      "tuned_params": {
+        "max_depth": 8,
+        "min_samples_leaf": 8
+      },
+      "using_tuned": true,
+      "validation_selected": {
+        "mae": 4.5948,
+        "rmse": 6.1154,
+        "r2": 0.2624
+      },
+      "test": {
+        "mae": 3.9366,
+        "rmse": 5.2294,
+        "r2": 0.4881
+      }
+    },
+    {
+      "name": "Gradient Boosting",
+      "validation_before": {
+        "mae": 4.6125,
+        "rmse": 6.1454,
+        "r2": 0.2551
+      },
+      "validation_after": {
+        "mae": 4.5412,
+        "rmse": 6.0334,
+        "r2": 0.282
+      },
+      "tuned_params": {
+        "learning_rate": 0.1,
+        "max_depth": 1,
+        "n_estimators": 100
+      },
+      "using_tuned": true,
+      "validation_selected": {
+        "mae": 4.5412,
+        "rmse": 6.0334,
+        "r2": 0.282
+      },
+      "test": {
+        "mae": 3.7913,
+        "rmse": 5.2071,
+        "r2": 0.4925
+      }
+    }
+  ],
+  "recursive_30_day_test": {
+    "metrics": {
+      "mae": 4.3951,
+      "rmse": 5.6879,
+      "r2": 0.0131
+    },
+    "windows": [
+      {
+        "start": "2010-04-28",
+        "actual_kwh": 758.826,
+        "predicted_kwh": 699.15
+      },
+      {
+        "start": "2010-05-28",
+        "actual_kwh": 716.303,
+        "predicted_kwh": 700.659
+      },
+      {
+        "start": "2010-06-27",
+        "actual_kwh": 568.043,
+        "predicted_kwh": 683.91
+      },
+      {
+        "start": "2010-08-26",
+        "actual_kwh": 692.657,
+        "predicted_kwh": 616.795
+      },
+      {
+        "start": "2010-10-25",
+        "actual_kwh": 825.82,
+        "predicted_kwh": 949.017
+      }
+    ]
+  },
+  "evaluation_note": "One-day test uses actual past readings. 30-day test uses recursive forecasts. Selection uses validation MAE only; production model is subsequently refit on all observed dates.",
+  "preprocessing_note": "Daily kWh from minute kW readings. Days with >=90% coverage are normalized to 1440 minutes; other days use previous 7-day median. Imputed targets are excluded from fitting and metrics. Features use past values only.",
+  "limitations": [
+    "One historical French household; performance may differ for other homes.",
+    "No weather or occupancy inputs; long forecasts accumulate error.",
+    "Bills use editable illustrative tariffs, not verified utility rates."
+  ]
+}
