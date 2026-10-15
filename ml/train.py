@@ -5,7 +5,7 @@ import joblib
 import numpy as np
 import pandas as pd
 from sklearn.base import clone
-from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
@@ -66,10 +66,9 @@ def main():
     Xtest, ytest = X.iloc[b:].loc[test], y.iloc[b:].loc[test]
     candidates = {
         "Linear Regression": (make_pipeline(StandardScaler(), LinearRegression()), {}),
-        "Random Forest": (RandomForestRegressor(n_estimators=100, max_depth=5, random_state=42, n_jobs=1),
-                          {"max_depth": [3, 5, 8], "min_samples_leaf": [3, 8]}),
-        "Gradient Boosting": (GradientBoostingRegressor(n_estimators=100, max_depth=2, random_state=42),
-                              {"n_estimators": [50, 100], "max_depth": [1, 2], "learning_rate": [.03, .1]})
+        "Random Forest": (RandomForestRegressor(n_estimators=100, max_depth=5, bootstrap=True,
+                                               max_features="sqrt", random_state=42, n_jobs=1),
+                          {"max_depth": [3, 5, 8], "min_samples_leaf": [3, 8]})
     }
     cv = TimeSeriesSplit(n_splits=4)
     results, trained = [], {}

@@ -14,7 +14,7 @@ Features are usage 1, 7 and 14 days ago, seven- and 28-day averages, seven-day s
 
 ## Development, evaluation and optimization
 
-Three models are compared: Linear Regression, Random Forest Regressor and Gradient Boosting Regressor. A previous-day prediction provides a simple baseline. The time-ordered data is divided into training, validation and testing periods. Model parameters are tuned only within training using four time-series folds. Validation MAE determines the retained settings and winning model. The test period does not determine selection.
+Two models are compared: Linear Regression and Random Forest Regressor. A previous-day prediction provides a simple baseline. Random Forest uses bagging: each tree trains on a bootstrap sample (sampling rows with replacement), and the forest averages tree predictions. `bootstrap=True` makes this explicit; `max_features="sqrt"` also selects random feature subsets at each split. The time-ordered data is divided into training, validation and testing periods. Model parameters are tuned only within training using four time-series folds. Validation MAE determines the retained settings and winning model. The test period does not determine selection.
 
 MAE describes average absolute error in kWh; RMSE penalizes large errors more strongly; RÂ² compares prediction errors with a constant mean predictor and can be negative. The dashboard shows real generated values; a complex model is not assumed to outperform the baseline.
 
@@ -32,13 +32,12 @@ The principal limitations are one-household historical data, missing weather/occ
 
 ## Recorded run
 
-Processed 2,075,259 readings into 1,440 daily records, with 22 low-coverage days filled. Selected **Gradient Boosting**.
+Processed 2,075,259 readings into 1,440 daily records, with 22 low-coverage days filled. Selected **Random Forest**.
 
 | Model | Test MAE (kWh) | Test RMSE (kWh) | Test R2 |
 | --- | --- | --- | --- |
 | Linear Regression | 4.199 | 5.466 | 0.441 |
-| Random Forest | 3.937 | 5.229 | 0.488 |
-| Gradient Boosting | 3.791 | 5.207 | 0.492 |
+| Random Forest | 3.834 | 5.198 | 0.494 |
 | Previous-day baseline | 4.564 | 6.525 | 0.203 |
 
-Selected model validation MAE changed from 4.612 to 4.541 kWh after tuning. Recursive 30-day test MAE was 4.395 kWh across 5 complete windows. This is daily error within those forecasts, not monthly bill error.
+Selected model validation MAE changed from 4.524 to 4.467 kWh after tuning. Recursive 30-day test MAE was 4.394 kWh across 5 complete windows. This is daily error within those forecasts, not monthly bill error.

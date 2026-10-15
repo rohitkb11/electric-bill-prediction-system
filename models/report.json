@@ -25,7 +25,7 @@
     "month_sin",
     "month_cos"
   ],
-  "selected_model": "Gradient Boosting",
+  "selected_model": "Random Forest",
   "split": {
     "train_end": "2009-09-27",
     "validation_end": "2010-04-27",
@@ -72,14 +72,14 @@
     {
       "name": "Random Forest",
       "validation_before": {
-        "mae": 4.6366,
-        "rmse": 6.1147,
-        "r2": 0.2626
+        "mae": 4.5237,
+        "rmse": 5.9679,
+        "r2": 0.2975
       },
       "validation_after": {
-        "mae": 4.5948,
-        "rmse": 6.1154,
-        "r2": 0.2624
+        "mae": 4.4674,
+        "rmse": 5.922,
+        "r2": 0.3083
       },
       "tuned_params": {
         "max_depth": 8,
@@ -87,77 +87,48 @@
       },
       "using_tuned": true,
       "validation_selected": {
-        "mae": 4.5948,
-        "rmse": 6.1154,
-        "r2": 0.2624
+        "mae": 4.4674,
+        "rmse": 5.922,
+        "r2": 0.3083
       },
       "test": {
-        "mae": 3.9366,
-        "rmse": 5.2294,
-        "r2": 0.4881
-      }
-    },
-    {
-      "name": "Gradient Boosting",
-      "validation_before": {
-        "mae": 4.6125,
-        "rmse": 6.1454,
-        "r2": 0.2551
-      },
-      "validation_after": {
-        "mae": 4.5412,
-        "rmse": 6.0334,
-        "r2": 0.282
-      },
-      "tuned_params": {
-        "learning_rate": 0.1,
-        "max_depth": 1,
-        "n_estimators": 100
-      },
-      "using_tuned": true,
-      "validation_selected": {
-        "mae": 4.5412,
-        "rmse": 6.0334,
-        "r2": 0.282
-      },
-      "test": {
-        "mae": 3.7913,
-        "rmse": 5.2071,
-        "r2": 0.4925
+        "mae": 3.8342,
+        "rmse": 5.1982,
+        "r2": 0.4942
       }
     }
   ],
   "recursive_30_day_test": {
     "metrics": {
-      "mae": 4.3951,
-      "rmse": 5.6879,
-      "r2": 0.0131
+      "mae": 4.3941,
+      "rmse": 5.7256,
+      "r2": -0.0001
     },
     "windows": [
       {
         "start": "2010-04-28",
         "actual_kwh": 758.826,
-        "predicted_kwh": 699.15
+        "predicted_kwh": 716.878
       },
       {
         "start": "2010-05-28",
         "actual_kwh": 716.303,
-        "predicted_kwh": 700.659
+        "predicted_kwh": 713.845
       },
       {
         "start": "2010-06-27",
         "actual_kwh": 568.043,
-        "predicted_kwh": 683.91
+        "predicted_kwh": 585.346
       },
       {
         "start": "2010-08-26",
         "actual_kwh": 692.657,
-        "predicted_kwh": 616.795
+        "predicted_kwh": 524.193
       },
       {
         "start": "2010-10-25",
         "actual_kwh": 825.82,
-        "predicted_kwh": 949.017
+        "predicted_kwh": 949.256
       }
     ]
   },

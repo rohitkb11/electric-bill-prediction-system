@@ -41,7 +41,7 @@ Source: [Kaggle Household Electric Power Consumption](https://www.kaggle.com/dat
 1. Convert minute-level kW readings into daily kWh. Correct small gaps; fill low-coverage days using the preceding seven-day median.
 2. Build past-only usage features (lags and rolling statistics) and calendar features.
 3. Split chronologically into 70% training, 15% validation and 15% testing. Exclude imputed targets from training and metrics.
-4. Compare Linear Regression, Random Forest and Gradient Boosting. Tune tree models using Grid Search with four time-series folds. Retain untuned settings if validation MAE worsens.
+4. Compare Linear Regression and Random Forest. Tune Random Forest using Grid Search with four time-series folds. Retain untuned settings if validation MAE worsens. Random Forest uses bootstrap samples (bagging), random feature subsets and averaged tree predictions.
 5. Select by validation MAE, then report held-out MAE, RMSE and R² plus a previous-day baseline. Separately evaluate recursive 30-day forecasts.
 6. Refit the selected model on all observed dates for the demo. Save `models/consumption.joblib` and `models/report.json`.
 
@@ -84,7 +84,7 @@ It returns daily predictions, total kWh, and the energy charge, fixed charge and
 | Problem definition | Forecast household electricity usage and estimate its cost |
 | Dataset collection | Reproducible Kaggle download with source attribution |
 | Data preprocessing | Missing values, daily aggregation, feature engineering and chronological split |
-| Model development | Three regression models and a persistence baseline |
+| Model development | Two regression models and a persistence baseline |
 | Performance evaluation | MAE, RMSE, R² and recursive forecast evaluation |
 | Model optimization | Grid Search and time-series cross-validation; before/after metrics |
 | Result analysis and documentation | Dashboard results, generated report and project write-up |

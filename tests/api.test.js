@@ -33,7 +33,7 @@ test('serves dashboard and real dataset report', async () => {
   const data = await res.json();
   assert.equal(data.history.length, 90);
   assert.ok(data.report.statistics.raw_rows > 2000000);
-  assert.ok(data.report.models.length >= 3);
+  assert.deepEqual(data.report.models.map(model => model.name), ['Linear Regression', 'Random Forest']);
 });
 test('rejects invalid prediction input with helpful JSON', async () => {
   const response = await fetch(`${base}/api/predict`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
