@@ -39,6 +39,7 @@
     "name": "Previous day",
     "test": {
       "mae": 4.5636,
+      "mse": 42.579,
       "rmse": 6.5253,
       "r2": 0.203
     }
@@ -48,11 +49,13 @@
       "name": "Linear Regression",
       "validation_before": {
         "mae": 4.8473,
+        "mse": 40.6406,
         "rmse": 6.375,
         "r2": 0.1984
       },
       "validation_after": {
         "mae": 4.8473,
+        "mse": 40.6406,
         "rmse": 6.375,
         "r2": 0.1984
       },
@@ -60,24 +63,33 @@
       "using_tuned": true,
       "validation_selected": {
         "mae": 4.8473,
+        "mse": 40.6406,
         "rmse": 6.375,
         "r2": 0.1984
       },
       "test": {
         "mae": 4.199,
+        "mse": 29.8829,
         "rmse": 5.4665,
         "r2": 0.4406
+      },
+      "high_usage_test": {
+        "accuracy": 0.7673,
+        "precision": 0.6818,
+        "recall": 0.6338
       }
     },
     {
       "name": "Random Forest",
       "validation_before": {
         "mae": 4.5237,
+        "mse": 35.6158,
         "rmse": 5.9679,
         "r2": 0.2975
       },
       "validation_after": {
         "mae": 4.4674,
+        "mse": 35.0705,
         "rmse": 5.922,
         "r2": 0.3083
       },
@@ -88,19 +100,34 @@
       "using_tuned": true,
       "validation_selected": {
         "mae": 4.4674,
+        "mse": 35.0705,
         "rmse": 5.922,
         "r2": 0.3083
       },
       "test": {
         "mae": 3.8342,
+        "mse": 27.0216,
         "rmse": 5.1982,
         "r2": 0.4942
+      },
+      "high_usage_test": {
+        "accuracy": 0.7723,
+        "precision": 0.6812,
+        "recall": 0.662
       }
     }
   ],
+  "high_usage_classification": {
+    "threshold_kwh": 25.305633,
+    "definition": "High usage = daily kWh >= median observed training consumption. Actual and predicted kWh use the same fixed threshold.",
+    "note": "Secondary classification derived from regression predictions; accuracy, precision and recall do not measure regression accuracy.",
+    "test_positive_days": 71,
+    "test_total_days": 202
+  },
   "recursive_30_day_test": {
     "metrics": {
       "mae": 4.3941,
+      "mse": 32.7828,
       "rmse": 5.7256,
       "r2": -0.0001
     },

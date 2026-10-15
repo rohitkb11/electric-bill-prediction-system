@@ -16,7 +16,9 @@ Features are usage 1, 7 and 14 days ago, seven- and 28-day averages, seven-day s
 
 Two models are compared: Linear Regression and Random Forest Regressor. A previous-day prediction provides a simple baseline. Random Forest uses bagging: each tree trains on a bootstrap sample (sampling rows with replacement), and the forest averages tree predictions. `bootstrap=True` makes this explicit; `max_features="sqrt"` also selects random feature subsets at each split. The time-ordered data is divided into training, validation and testing periods. Model parameters are tuned only within training using four time-series folds. Validation MAE determines the retained settings and winning model. The test period does not determine selection.
 
-MAE describes average absolute error in kWh; RMSE penalizes large errors more strongly; RÂ² compares prediction errors with a constant mean predictor and can be negative. The dashboard shows real generated values; a complex model is not assumed to outperform the baseline.
+MAE describes average absolute error in kWh; MSE is mean squared error in kWh², and RMSE is its square root. R² compares prediction errors with a constant mean predictor and can be negative. The dashboard shows real generated values; a complex model is not assumed to outperform the baseline.
+
+`ml/plot_metrics.py` uses Matplotlib to plot test MSE and R² for both models. A separate graph compares accuracy, precision and recall for derived high-usage detection. A day is high usage when its kWh is at least the median observed training consumption; the same training-only threshold labels actual test values and regression predictions. Accuracy measures correct high/normal labels; precision measures how many predicted-high days were actually high; recall measures how many actual-high days were detected. These are secondary classification scores, not regression accuracy. No additional classifier is trained. Undefined precision/recall values are set to zero.
 
 Next-day evaluation has actual earlier readings available. For the 30-day evaluation, each predicted value is fed into the following day's features. The report includes complete, non-imputed 30-day windows in the held-out test period. These metrics better represent a multi-day forecast. After evaluation, the selected model is fitted on all observed dates for the interactive demo.
 
@@ -41,3 +43,12 @@ Processed 2,075,259 readings into 1,440 daily records, with 22 low-coverage days
 | Previous-day baseline | 4.564 | 6.525 | 0.203 |
 
 Selected model validation MAE changed from 4.524 to 4.467 kWh after tuning. Recursive 30-day test MAE was 4.394 kWh across 5 complete windows. This is daily error within those forecasts, not monthly bill error.
+
+## Matplotlib model comparison
+
+| Model | Test MSE (kWh squared) | Test R2 | High-usage accuracy | High-usage precision | High-usage recall |
+| --- | --- | --- | --- | --- | --- |
+| Linear Regression | 29.883 | 0.441 | 76.73% | 68.18% | 63.38% |
+| Random Forest | 27.022 | 0.494 | 77.23% | 68.12% | 66.20% |
+
+High usage is defined using the training median (25.305633 kWh). Random Forest has lower MSE and higher R2 on this held-out test, so it performs better for consumption regression here. It also has slightly higher high-usage accuracy and recall; Linear Regression has slightly higher precision. These results are specific to this dataset and split.

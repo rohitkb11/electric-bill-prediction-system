@@ -34,6 +34,20 @@ test('serves dashboard and real dataset report', async () => {
   assert.equal(data.history.length, 90);
   assert.ok(data.report.statistics.raw_rows > 2000000);
   assert.deepEqual(data.report.models.map(model => model.name), ['Linear Regression', 'Random Forest']);
+  for (const model of data.report.models) {
+    assert.ok(model.test.mse >= 0);
+    assert.ok(Math.abs(model.test.mse - model.test.rmse ** 2) < 0.002);
+    for (const score of Object.values(model.high_usage_test)) assert.ok(score >= 0 && score <= 1);
+  }
+});
+test('serves Matplotlib comparison plots as PNG images', async () => {
+  for (const name of ['regression-comparison', 'high-usage-comparison']) {
+    const response = await fetch(`${base}/plots/${name}.png`);
+    assert.equal(response.status, 200);
+    assert.match(response.headers.get('content-type'), /image\/png/);
+    const bytes = Buffer.from(await response.arrayBuffer());
+    assert.deepEqual([...bytes.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+  }
 });
 test('rejects invalid prediction input with helpful JSON', async () => {
   const response = await fetch(`${base}/api/predict`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });

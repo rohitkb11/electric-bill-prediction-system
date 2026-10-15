@@ -32,6 +32,15 @@
       </div>
     </section>
     <section class="panel evaluation"><div class="evaluation-heading"><div><p class="eyebrow">THE MACHINE LEARNING BEHIND IT</p><h2>Model comparison</h2></div><span class="tag" id="selected-model">Loading model…</span></div><p class="hint">Held-out next-day results. Lower MAE/RMSE is better; higher R² is better. The model is selected using validation data.</p><div class="table-wrap"><table><thead><tr><th>Model</th><th>Validation MAE, before tuning</th><th>Validation MAE, after tuning</th><th>Test MAE (kWh)</th><th>Test RMSE (kWh)</th><th>Test R²</th></tr></thead><tbody id="model-rows"></tbody></table></div><p class="hint" id="evaluation-note"></p><details><summary>Dataset preparation & evaluation</summary><p id="data-note"></p><p id="split-note"></p><p id="preprocessing-note"></p><p>Past usage and calendar features feed the model. Multi-day forecasts reuse predictions as inputs, so error can accumulate. Production training uses all observed dates after evaluation.</p><a href="https://www.kaggle.com/datasets/uciml/electric-power-consumption-data-set" target="_blank" rel="noreferrer">View original Kaggle dataset ↗</a></details></section>
+    <section class="panel evaluation model-plots">
+      <p class="eyebrow">MATPLOTLIB EVALUATION GRAPHS</p>
+      <h2>Linear Regression vs Random Forest</h2>
+      <p class="hint" id="comparison-summary">Comparing held-out next-day predictions from both models.</p>
+      <img src="/plots/regression-comparison.png" alt="Matplotlib bar graphs comparing test MSE and R squared for Linear Regression and Random Forest.">
+      <h2>High-usage detection: accuracy, precision & recall</h2>
+      <p class="hint" id="classification-note">These classification scores use a training-data threshold to label actual and predicted consumption as high or normal. They are separate from regression performance.</p>
+      <img src="/plots/high-usage-comparison.png" alt="Matplotlib grouped bar graph comparing accuracy, precision and recall for derived high-usage detection.">
+    </section>
     <footer><span>WattWise · Electricity Consumption & Bill Prediction</span><span>Python ML · Express backend · Simple web frontend</span></footer>
   </main>
 </body>

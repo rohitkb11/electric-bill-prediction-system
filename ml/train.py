@@ -7,16 +7,19 @@ import pandas as pd
 from sklearn.base import clone
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.metrics import (mean_absolute_error, mean_squared_error, r2_score,
+                             accuracy_score, precision_score, recall_score)
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from features import FEATURES, forecast, supervised
+from plot_metrics import plot_comparison
 
 ROOT = Path(__file__).resolve().parents[1]
 
 def metrics(actual, predicted):
     return {"mae": round(float(mean_absolute_error(actual, predicted)), 4),
+            "mse": round(float(mean_squared_error(actual, predicted)), 4),
             "rmse": round(float(np.sqrt(mean_squared_error(actual, predicted))), 4),
             "r2": round(float(r2_score(actual, predicted)), 4)}
 
@@ -64,6 +67,8 @@ def main():
     Xtrain, ytrain = X.iloc[:a].loc[train], y.iloc[:a].loc[train]
     Xval, yval = X.iloc[a:b].loc[val], y.iloc[a:b].loc[val]
     Xtest, ytest = X.iloc[b:].loc[test], y.iloc[b:].loc[test]
+    # Define the positive class using training data only, before evaluating test data.
+    high_usage_threshold = float(ytrain.median())
     candidates = {
         "Linear Regression": (make_pipeline(StandardScaler(), LinearRegression()), {}),
         "Random Forest": (RandomForestRegressor(n_estimators=100, max_depth=5, bootstrap=True,
@@ -95,7 +100,15 @@ def main():
         model = clone(trained[result["name"]])
         mask = observed.iloc[:b]
         model.fit(X.iloc[:b].loc[mask], y.iloc[:b].loc[mask])
-        result["test"] = metrics(ytest, np.maximum(0, model.predict(Xtest)))
+        predictions = np.maximum(0, model.predict(Xtest))
+        result["test"] = metrics(ytest, predictions)
+        actual_high = ytest >= high_usage_threshold
+        predicted_high = predictions >= high_usage_threshold
+        result["high_usage_test"] = {
+            "accuracy": round(float(accuracy_score(actual_high, predicted_high)), 4),
+            "precision": round(float(precision_score(actual_high, predicted_high, zero_division=0)), 4),
+            "recall": round(float(recall_score(actual_high, predicted_high, zero_division=0)), 4)
+        }
     evaluation_model = clone(trained[winner])
     mask = observed.iloc[:b]
     evaluation_model.fit(X.iloc[:b].loc[mask], y.iloc[:b].loc[mask])
@@ -122,6 +135,13 @@ def main():
                   "observed_test_rows": len(Xtest)},
         "baseline": {"name": "Previous day", "test": metrics(ytest, Xtest.lag_1)},
         "models": results,
+        "high_usage_classification": {
+            "threshold_kwh": high_usage_threshold,
+            "definition": "High usage = daily kWh >= median observed training consumption. Actual and predicted kWh use the same fixed threshold.",
+            "note": "Secondary classification derived from regression predictions; accuracy, precision and recall do not measure regression accuracy.",
+            "test_positive_days": int((ytest >= high_usage_threshold).sum()),
+            "test_total_days": len(ytest)
+        },
         "recursive_30_day_test": {"metrics": metrics(horizon_actual, horizon_pred) if windows else None,
                                   "windows": windows},
         "evaluation_note": "One-day test uses actual past readings. 30-day test uses recursive forecasts. Selection uses validation MAE only; production model is subsequently refit on all observed dates.",
@@ -131,6 +151,7 @@ def main():
                         "Bills use editable illustrative tariffs, not verified utility rates."]
     }
     (ROOT / "models/report.json").write_text(json.dumps(report, indent=2, allow_nan=False), encoding="utf-8")
+    plot_comparison(report)
     print("Saved model and report. Selected:", winner, flush=True)
 
 if __name__ == "__main__":

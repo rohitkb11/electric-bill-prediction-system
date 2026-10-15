@@ -10,6 +10,7 @@ A simple AI/ML mini-project that forecasts daily household electricity consumpti
 - Estimates the bill: **predicted kWh × per-unit rate + fixed charge**.
 - Accepts your own readings, date and tariff values.
 - Shows model comparisons, evaluation metrics and tuning results.
+- Plots MSE and R² using Matplotlib, plus separate accuracy/precision/recall graphs for derived high-usage detection.
 
 No database, login, frontend build tool or external prediction service is needed.
 
@@ -44,6 +45,14 @@ Source: [Kaggle Household Electric Power Consumption](https://www.kaggle.com/dat
 4. Compare Linear Regression and Random Forest. Tune Random Forest using Grid Search with four time-series folds. Retain untuned settings if validation MAE worsens. Random Forest uses bootstrap samples (bagging), random feature subsets and averaged tree predictions.
 5. Select by validation MAE, then report held-out MAE, RMSE and R² plus a previous-day baseline. Separately evaluate recursive 30-day forecasts.
 6. Refit the selected model on all observed dates for the demo. Save `models/consumption.joblib` and `models/report.json`.
+
+Training generates two Matplotlib graphs in `public/plots/`, displayed on the dashboard. Regenerate them from the saved report without retraining:
+
+```powershell
+.\.venv\Scripts\python.exe ml/plot_metrics.py
+```
+
+**Metric meanings:** MSE (kWh², lower is better) and R² (higher is better) compare consumption regression. Accuracy, precision and recall apply to a separate high-usage label derived from each regressor's predictions: **high = daily kWh >= the median observed training consumption**. This fixed training-only threshold is applied to actual and predicted test readings. These scores measure high-usage detection, not accuracy of predicted kWh or bills. Precision and recall refer to the high-usage positive class; an undefined score is reported as zero.
 
 ## Small project structure
 
