@@ -1,0 +1,10 @@
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+.env
+data/*.zip
+data/household_power_consumption.txt
+data/*raw*.csv
+tmp/
+*.log
