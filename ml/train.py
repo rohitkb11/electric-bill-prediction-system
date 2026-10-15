@@ -24,31 +24,23 @@ def metrics(actual, predicted):
             "r2": round(float(r2_score(actual, predicted)), 4)}
 
 def preprocess():
-    source = ROOT / "data/household_power_consumption.txt"
+    source = ROOT / "data/daily.csv"
     if not source.exists():
-        raise SystemExit("Raw Kaggle file missing. Run python ml/download.py first.")
-    raw = pd.read_csv(source, sep=";", na_values="?", low_memory=False,
-                      usecols=["Date", "Time", "Global_active_power"])
-    raw.index = pd.to_datetime(raw.Date + " " + raw.Time, format="%d/%m/%Y %H:%M:%S")
-    power = pd.to_numeric(raw.Global_active_power, errors="coerce").sort_index()
-    power = power[~power.index.duplicated(keep="first")]
-    power = power.where(power >= 0)
-    counts = power.resample("D").count()
-    # kW sampled once each minute -> kWh = sum(kW) / 60.
-    # Correct small daily gaps for observed coverage; do not invent long gaps.
-    energy = power.resample("D").sum(min_count=1) / 60 * (1440 / counts.replace(0, np.nan))
-    energy = energy.where(counts >= 1296)  # require at least 90% daily coverage
+        raise SystemExit("Dataset missing: data/daily.csv")
+    daily = pd.read_csv(source, parse_dates=["date"], index_col="date").sort_index()
+    daily = daily[~daily.index.duplicated(keep="first")].asfreq("D")
+    energy = pd.to_numeric(daily.kwh, errors="coerce")
+    energy = energy.where(energy >= 0)
     energy = energy.loc[energy.first_valid_index():energy.last_valid_index()]
-    imputed = energy.isna()
+    # Retain the source's filled-day flags and mark any newly missing readings.
+    imputed = daily.imputed.reindex(energy.index).fillna(False).astype(bool) | energy.isna()
     for i in range(len(energy)):
         if pd.isna(energy.iloc[i]):
             energy.iloc[i] = energy.iloc[max(0, i - 7):i].median()
     daily = pd.DataFrame({"kwh": energy.round(6), "imputed": imputed})
     daily.index.name = "date"
-    daily.to_csv(ROOT / "data/daily.csv")
-    return daily, {"raw_rows": len(raw), "missing_power_readings": int(power.isna().sum()),
-                   "daily_rows": len(daily), "imputed_days": int(imputed.sum()),
-                   "minimum_daily_coverage": 0.9, "start": str(daily.index[0].date()),
+    return daily, {"daily_rows": len(daily), "imputed_days": int(imputed.sum()),
+                   "start": str(daily.index[0].date()),
                    "end": str(daily.index[-1].date()),
                    "mean_daily_kwh": round(float(daily.kwh.mean()), 3),
                    "min_daily_kwh": round(float(daily.kwh.min()), 3),
@@ -126,7 +118,7 @@ def main():
     final.fit(X.loc[observed], y.loc[observed])
     joblib.dump(final, ROOT / "models/consumption.joblib", compress=3)
     report = {
-        "dataset": "Kaggle / UCI Household Electric Power Consumption",
+        "dataset": "daily.csv: daily household consumption derived from Kaggle / UCI",
         "source_url": "https://www.kaggle.com/datasets/uciml/electric-power-consumption-data-set",
         "statistics": stats, "features": FEATURES, "selected_model": winner,
         "split": {"train_end": str(X.index[a-1].date()), "validation_end": str(X.index[b-1].date()),
@@ -145,7 +137,7 @@ def main():
         "recursive_30_day_test": {"metrics": metrics(horizon_actual, horizon_pred) if windows else None,
                                   "windows": windows},
         "evaluation_note": "One-day test uses actual past readings. 30-day test uses recursive forecasts. Selection uses validation MAE only; production model is subsequently refit on all observed dates.",
-        "preprocessing_note": "Daily kWh from minute kW readings. Days with >=90% coverage are normalized to 1440 minutes; other days use previous 7-day median. Imputed targets are excluded from fitting and metrics. Features use past values only.",
+        "preprocessing_note": "Read data/daily.csv, sort dates, remove duplicate dates and handle invalid/missing kWh using the preceding 7-day median. The imputed column identifies filled days, which are excluded as fitting/evaluation targets. Features use past values only. Original Kaggle data was aggregated to daily kWh before creating this CSV.",
         "limitations": ["One historical French household; performance may differ for other homes.",
                         "No weather or occupancy inputs; long forecasts accumulate error.",
                         "Bills use editable illustrative tariffs, not verified utility rates."]

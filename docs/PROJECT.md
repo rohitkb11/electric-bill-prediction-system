@@ -6,9 +6,9 @@ Households need an estimate of upcoming energy use and its cost. Given consecuti
 
 ## Dataset and preprocessing
 
-The Kaggle/UCI Individual Household Electric Power Consumption dataset records minute-level measurements for one household. `Global_active_power` is in kW. Summing the minute measurements and dividing by 60 gives daily kWh.
+The project uses one dataset, `data/daily.csv`, with 1,440 daily records and three columns: `date`, `kwh` and `imputed`. Both training and the dashboard read this same CSV. Its values were derived from Kaggle/UCI Individual Household Electric Power Consumption; it is an attributed daily adaptation, not a separate original Kaggle dataset. No raw TXT or ZIP is needed.
 
-The script parses date/time, marks invalid power values as missing and removes duplicate timestamps. Days with at least 90% valid readings are normalized for missing coverage. Other days use the preceding seven-day median. This assumes the available minutes represent the day and the previous week reasonably represents a missing day; both assumptions can introduce error. Imputed days supply history but are excluded as training/evaluation targets.
+During original CSV preparation, minute-level kW readings were summed and divided by 60 to give daily kWh. Days with at least 90% valid readings were normalized for coverage; other days used the preceding seven-day median. These assumptions can introduce error. The training script now reads the CSV directly, sorts dates, removes duplicate dates and handles additional invalid/missing readings. Imputed days supply history but are excluded as training/evaluation targets.
 
 Features are usage 1, 7 and 14 days ago, seven- and 28-day averages, seven-day standard deviation, and cyclical weekday/month values. Every usage feature is computed strictly from the past. Linear Regression uses standardized features; tree models do not require scaling.
 
@@ -34,7 +34,7 @@ The principal limitations are one-household historical data, missing weather/occ
 
 ## Recorded run
 
-Processed 2,075,259 readings into 1,440 daily records, with 22 low-coverage days filled. Selected **Random Forest**.
+Trained directly from 1,440 CSV daily records, including 22 flagged filled days excluded as targets. Selected **Random Forest**.
 
 | Model | Test MAE (kWh) | Test RMSE (kWh) | Test R2 |
 | --- | --- | --- | --- |

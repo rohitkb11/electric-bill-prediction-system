@@ -32,7 +32,7 @@ test('serves dashboard and real dataset report', async () => {
   assert.equal(res.status, 200);
   const data = await res.json();
   assert.equal(data.history.length, 90);
-  assert.ok(data.report.statistics.raw_rows > 2000000);
+  assert.equal(data.report.statistics.daily_rows, 1440);
   assert.deepEqual(data.report.models.map(model => model.name), ['Linear Regression', 'Random Forest']);
   for (const model of data.report.models) {
     assert.ok(model.test.mse >= 0);

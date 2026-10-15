@@ -80,5 +80,5 @@ app.post('/api/predict', (req, res) => {
 app.use((error, req, res, next) => {
   console.error(error.message);
   const status = error.status === 400 || error.status === 413 ? error.status : 500;
-  res.status(status).json({ error: status === 500 ? 'Data unavailable. Download the dataset and run training first.' : 'Invalid or oversized JSON request.' });
+  res.status(status).json({ error: status === 500 ? 'Data unavailable. Check data/daily.csv and run training first.' : 'Invalid or oversized JSON request.' });
 });

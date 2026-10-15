@@ -1,12 +1,9 @@
 {
-  "dataset": "Kaggle / UCI Household Electric Power Consumption",
+  "dataset": "daily.csv: daily household consumption derived from Kaggle / UCI",
   "source_url": "https://www.kaggle.com/datasets/uciml/electric-power-consumption-data-set",
   "statistics": {
-    "raw_rows": 2075259,
-    "missing_power_readings": 25979,
     "daily_rows": 1440,
     "imputed_days": 22,
-    "minimum_daily_coverage": 0.9,
     "start": "2006-12-17",
     "end": "2010-11-25",
     "mean_daily_kwh": 26.09,
@@ -160,7 +157,7 @@
     ]
   },
   "evaluation_note": "One-day test uses actual past readings. 30-day test uses recursive forecasts. Selection uses validation MAE only; production model is subsequently refit on all observed dates.",
-  "preprocessing_note": "Daily kWh from minute kW readings. Days with >=90% coverage are normalized to 1440 minutes; other days use previous 7-day median. Imputed targets are excluded from fitting and metrics. Features use past values only.",
+  "preprocessing_note": "Read data/daily.csv, sort dates, remove duplicate dates and handle invalid/missing kWh using the preceding 7-day median. The imputed column identifies filled days, which are excluded as fitting/evaluation targets. Features use past values only. Original Kaggle data was aggregated to daily kWh before creating this CSV.",
   "limitations": [
     "One historical French household; performance may differ for other homes.",
     "No weather or occupancy inputs; long forecasts accumulate error.",

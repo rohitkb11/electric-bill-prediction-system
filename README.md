@@ -16,7 +16,7 @@ No database, login, frontend build tool or external prediction service is needed
 
 ## Run locally
 
-Install Node.js 20+ and Python **3.12 or 3.13**. The trained model and processed daily data are included, so downloading and training are optional for the first demo.
+Install Node.js 20+ and Python **3.12 or 3.13**. The trained model and single CSV dataset are included, so training is optional for the first demo.
 
 ```powershell
 python -m venv .venv
@@ -32,14 +32,19 @@ On macOS/Linux, replace the install command with `.venv/bin/python -m pip instal
 ## Reproduce the ML work
 
 ```powershell
-.\.venv\Scripts\python.exe ml/download.py
 .\.venv\Scripts\python.exe ml/train.py
 npm test
 ```
 
-Source: [Kaggle Household Electric Power Consumption](https://www.kaggle.com/datasets/uciml/electric-power-consumption-data-set), originally [UCI](https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption). The download script uses Kaggle's public download endpoint. If Kaggle requires sign-in, download manually and place `household_power_consumption.txt` in `data/`.
+Training and the dashboard both use **`data/daily.csv`**, the only dataset required. It contains 1,440 daily records derived from [Kaggle Household Electric Power Consumption](https://www.kaggle.com/datasets/uciml/electric-power-consumption-data-set), originally [UCI](https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption). No download, ZIP extraction or TXT conversion is needed.
 
-1. Convert minute-level kW readings into daily kWh. Correct small gaps; fill low-coverage days using the preceding seven-day median.
+| Column | Meaning |
+| --- | --- |
+| `date` | Reading date, YYYY-MM-DD |
+| `kwh` | Total daily electricity consumption |
+| `imputed` | Whether the daily value was filled during original dataset preparation |
+
+1. Read the CSV, sort dates, remove duplicate dates and fill invalid/missing consumption using the preceding seven-day median.
 2. Build past-only usage features (lags and rolling statistics) and calendar features.
 3. Split chronologically into 70% training, 15% validation and 15% testing. Exclude imputed targets from training and metrics.
 4. Compare Linear Regression and Random Forest. Tune Random Forest using Grid Search with four time-series folds. Retain untuned settings if validation MAE worsens. Random Forest uses bootstrap samples (bagging), random feature subsets and averaged tree predictions.
@@ -59,8 +64,8 @@ Training generates two Matplotlib graphs in `public/plots/`, displayed on the da
 ```text
 public/       Dashboard: index.html, style.css, app.js
 server/       Express API and bill calculation
-ml/           Download, preprocessing, training and prediction
-data/         Processed daily data and source attribution
+ml/           CSV preprocessing, training, plotting and prediction
+data/         One dataset: daily.csv, plus source attribution
 models/       Trained model and actual evaluation report
 tests/        Input validation, billing and API integration checks
 docs/         Mini-project explanation and implementation phases
@@ -91,8 +96,8 @@ It returns daily predictions, total kWh, and the energy charge, fixed charge and
 | PR12 requirement | Implementation |
 | --- | --- |
 | Problem definition | Forecast household electricity usage and estimate its cost |
-| Dataset collection | Reproducible Kaggle download with source attribution |
-| Data preprocessing | Missing values, daily aggregation, feature engineering and chronological split |
+| Dataset collection | One included CSV derived from Kaggle, with source attribution |
+| Data preprocessing | Missing values, date sorting, duplicate removal, feature engineering and chronological split |
 | Model development | Two regression models and a persistence baseline |
 | Performance evaluation | MAE, RMSE, R² and recursive forecast evaluation |
 | Model optimization | Grid Search and time-series cross-validation; before/after metrics |
@@ -102,4 +107,4 @@ It returns daily predictions, total kWh, and the energy charge, fixed charge and
 
 The data is from **one French household, 2006–2010**; this is a historical forecasting demonstration, not a model validated across Indian homes. Entering your readings does not retrain it. Consumption is predicted by ML; the bill is calculated from your tariff. The default rupee rate is illustrative and does not include slabs, taxes, subsidies or provider-specific rules. Fixed charges apply once to the selected period. Longer forecasts accumulate error, and real-world savings or billing accuracy are not guaranteed.
 
-The raw 2-million-row dataset, local environment and dependencies are excluded from Git. Credit: Georges Hebrail and Alice Berard, EDF R&D; see `data/README.md` for source details.
+The local environment and installed dependencies are excluded from Git. Credit: Georges Hebrail and Alice Berard, EDF R&D; see `data/README.md` for the CSV's source and preparation details.
