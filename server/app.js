@@ -6,47 +6,43 @@ import { fileURLToPath } from 'node:url';
 import { calculateBill } from './bill.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const readReport = () => JSON.parse(readFileSync(path.join(root, 'models/report.json'), 'utf8'));
 export const app = express();
 app.disable('x-powered-by');
-app.use(express.json({ limit: '32kb' }));
+app.use(express.json({ limit: '16kb' }));
 app.use(express.static(path.join(root, 'public')));
 
-export function validateForecast(body) {
-  const { history, lastDate, days, rate, fixedCharge } = body ?? {};
-  if (!Array.isArray(history) || history.length < 28 || history.length > 3660 ||
-      history.some(n => typeof n !== 'number' || !Number.isFinite(n) || n < 0 || n > 10000)) {
-    throw new Error('Enter 28–3660 consecutive daily readings, each between 0 and 10,000 kWh.');
+export function validateInput(body) {
+  const report = readReport();
+  const household = {};
+  for (const field of report.input_schema) {
+    const value = body?.household?.[field.name];
+    if (field.type === 'select') {
+      if (!field.options.includes(value)) throw new Error(`Choose a supported ${field.label.toLowerCase()}.`);
+    } else if (!Number.isInteger(value) || value < field.min || value > field.max) {
+      throw new Error(`${field.label} must be an integer between ${field.min} and ${field.max}.`);
+    }
+    household[field.name] = value;
   }
-  const date = new Date(lastDate);
-  if (typeof lastDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(lastDate) ||
-      !Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== lastDate ||
-      lastDate < '1900-01-01' || lastDate > '2099-12-31') throw new Error('Enter a valid final reading date (1900–2099).');
-  if (!Number.isInteger(days) || days < 1 || days > 30) throw new Error('Forecast length must be 1–30 days.');
+  const { rate, fixedCharge } = body ?? {};
   if (typeof rate !== 'number' || !Number.isFinite(rate) || rate < 0 || rate > 1000 ||
       typeof fixedCharge !== 'number' || !Number.isFinite(fixedCharge) || fixedCharge < 0 || fixedCharge > 100000) {
-    throw new Error('Enter a rate of ₹0–1,000 and a fixed charge of ₹0–100,000.');
+    throw new Error('Enter a rate of 0-1,000 BDT and a fixed charge of 0-100,000 BDT.');
   }
-  return { history, lastDate, days, rate, fixedCharge };
+  return { household, rate, fixedCharge };
 }
 
 app.get('/api/data', (req, res, next) => {
-  try {
-    const report = JSON.parse(readFileSync(path.join(root, 'models/report.json'), 'utf8'));
-    const rows = readFileSync(path.join(root, 'data/daily.csv'), 'utf8').trim().split(/\r?\n/).slice(1);
-    const history = rows.slice(-90).map(line => {
-      const [date, kwh, imputed] = line.split(',');
-      return { date, kwh: Number(kwh), imputed: imputed === 'True' };
-    });
-    res.json({ report, history });
-  } catch (error) { next(error); }
+  try { res.json({ report: readReport() }); }
+  catch (error) { next(error); }
 });
 
 let busy = false;
 app.post('/api/predict', (req, res) => {
   let input;
-  try { input = validateForecast(req.body); }
+  try { input = validateInput(req.body); }
   catch (error) { return res.status(400).json({ error: error.message }); }
-  if (busy) return res.status(503).json({ error: 'A forecast is running. Please try again shortly.' });
+  if (busy) return res.status(503).json({ error: 'A prediction is running. Please try again shortly.' });
   const venv = path.join(root, '.venv', process.platform === 'win32' ? 'Scripts/python.exe' : 'bin/python');
   const python = process.env.PYTHON_PATH || (existsSync(venv) ? venv : 'python');
   busy = true;
@@ -59,7 +55,7 @@ app.post('/api/predict', (req, res) => {
   child.on('error', error => {
     clearTimeout(timer); busy = false;
     console.error(error.message);
-    if (!res.headersSent) res.status(500).json({ error: 'Python could not start. Install requirements and check PYTHON_PATH.' });
+    if (!res.headersSent) res.status(500).json({ error: 'Python could not start. Check requirements and PYTHON_PATH.' });
   });
   child.on('close', code => {
     clearTimeout(timer); busy = false;
@@ -69,16 +65,16 @@ app.post('/api/predict', (req, res) => {
       return res.status(500).json({ error: 'Prediction failed. Check Python dependencies and train the model first.' });
     }
     try {
-      const { predictions } = JSON.parse(output);
-      const totalKwh = Math.round(predictions.reduce((sum, row) => sum + row.kwh, 0) * 100) / 100;
-      res.json({ predictions, totalKwh, bill: calculateBill(totalKwh, input.rate, input.fixedCharge) });
+      const { monthlyKwh } = JSON.parse(output);
+      if (!Number.isFinite(monthlyKwh) || monthlyKwh < 0) throw new Error('Invalid prediction');
+      res.json({ monthlyKwh, bill: calculateBill(monthlyKwh, input.rate, input.fixedCharge) });
     } catch { res.status(500).json({ error: 'The model returned an invalid response.' }); }
   });
-  child.stdin.end(JSON.stringify({ history: input.history, last_date: input.lastDate, days: input.days }));
+  child.stdin.end(JSON.stringify(input.household));
 });
 
 app.use((error, req, res, next) => {
   console.error(error.message);
   const status = error.status === 400 || error.status === 413 ? error.status : 500;
-  res.status(status).json({ error: status === 500 ? 'Data unavailable. Check data/daily.csv and run training first.' : 'Invalid or oversized JSON request.' });
+  res.status(status).json({ error: status === 500 ? 'Model report unavailable. Run python ml/train.py first.' : 'Invalid or oversized JSON request.' });
 });

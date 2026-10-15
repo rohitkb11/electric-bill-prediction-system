@@ -10,11 +10,11 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 COLORS = ["#8aab8d", "#21614f"]
 
-def plot_comparison(report):
+def plot_comparison(report, actual=None, predicted=None):
     folder = ROOT / "public/plots"
     folder.mkdir(exist_ok=True)
     models = report["models"]
-    names = [model["name"] for model in models]
+    names = [model["name"].replace(" Linear Regression", "\nLinear Regression") for model in models]
     plt.rcParams.update({"font.size": 11, "axes.spines.top": False, "axes.spines.right": False})
 
     fig, axes = plt.subplots(1, 2, figsize=(10, 4.4), layout="constrained")
@@ -30,7 +30,7 @@ def plot_comparison(report):
         ax.set_ylim(low - (margin if low < 0 else 0), high + margin)
         ax.set_axisbelow(True)
         ax.grid(axis="y", alpha=.2)
-    fig.suptitle("Linear Regression vs Random Forest · held-out next-day test", fontsize=13)
+    fig.suptitle("Linear Regression · base vs tuned · held-out monthly consumption", fontsize=13)
     fig.savefig(folder / "regression-comparison.png", dpi=160, facecolor="white")
     plt.close(fig)
 
@@ -43,7 +43,7 @@ def plot_comparison(report):
         bars = ax.bar(x + (i - .5) * width, values, width, label=model["name"], color=COLORS[i])
         ax.bar_label(bars, labels=[f"{value:.1%}" for value in values], padding=4, fontsize=10)
     threshold = report["high_usage_classification"]["threshold_kwh"]
-    ax.set(title=f"High-usage detection · daily kWh ≥ {threshold:.2f} (training median)",
+    ax.set(title=f"High-usage detection · monthly kWh ≥ {threshold:.2f} (training median)",
            ylabel="Classification score", ylim=(0, 1.16), xticks=x,
            xticklabels=[label.title() for label in labels])
     ax.yaxis.set_major_formatter(PercentFormatter(1))
@@ -54,5 +54,19 @@ def plot_comparison(report):
     fig.savefig(folder / "high-usage-comparison.png", dpi=160, facecolor="white")
     plt.close(fig)
 
+    if actual is not None and predicted is not None:
+        fig, ax = plt.subplots(figsize=(7, 5), layout="constrained")
+        ax.scatter(actual, predicted, color=COLORS[1], alpha=.6, s=22)
+        low, high = min(actual.min(), predicted.min()), max(actual.max(), predicted.max())
+        ax.plot([low, high], [low, high], "--", color="#b28b20", label="Perfect prediction")
+        ax.set(title="Linear Regression · actual vs predicted (200 test households)",
+               xlabel="Actual monthly consumption (kWh)", ylabel="Predicted monthly consumption (kWh)")
+        ax.legend()
+        fig.savefig(folder / "actual-vs-predicted.png", dpi=160, facecolor="white")
+        plt.close(fig)
+
 if __name__ == "__main__":
-    plot_comparison(json.loads((ROOT / "models/report.json").read_text(encoding="utf-8")))
+    report = json.loads((ROOT / "models/report.json").read_text(encoding="utf-8"))
+    examples = json.loads((ROOT / "models/test_predictions.json").read_text(encoding="utf-8"))
+    plot_comparison(report, np.array([row["actual_kwh"] for row in examples]),
+                    np.array([row["predicted_kwh"] for row in examples]))

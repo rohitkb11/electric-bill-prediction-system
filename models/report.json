@@ -1,166 +1,251 @@
 {
-  "dataset": "daily.csv: daily household consumption derived from Kaggle / UCI",
-  "source_url": "https://www.kaggle.com/datasets/uciml/electric-power-consumption-data-set",
+  "problem_definition": "Estimate monthly household electricity consumption from location, family size, rooms and appliances. Calculate a bill using a user-entered tariff.",
+  "dataset": "household_electricity.csv",
+  "source_url": "https://www.kaggle.com/datasets/armanahmedtaief/electricity-bill-prediction",
   "statistics": {
-    "daily_rows": 1440,
-    "imputed_days": 22,
-    "start": "2006-12-17",
-    "end": "2010-11-25",
-    "mean_daily_kwh": 26.09,
-    "min_daily_kwh": 4.172,
-    "max_daily_kwh": 79.556
+    "source_rows": 1000,
+    "usable_rows": 1000,
+    "duplicates_removed": 0,
+    "invalid_targets_removed": 0,
+    "missing_features": {
+      "Household_Size": 0,
+      "Rooms": 0,
+      "AC_Units": 0,
+      "Fan_Count": 0,
+      "Light_Count": 0,
+      "Refrigerator": 0,
+      "TV_Count": 0,
+      "Washing_Machine": 0,
+      "Other_Appliances": 0,
+      "Location": 0,
+      "Area_Type": 0
+    },
+    "mean_monthly_kwh": 370.78
   },
+  "target": "Monthly_Usage_kWh",
   "features": [
-    "lag_1",
-    "lag_7",
-    "lag_14",
-    "mean_7",
-    "mean_28",
-    "std_7",
-    "weekday_sin",
-    "weekday_cos",
-    "month_sin",
-    "month_cos"
+    "Household_Size",
+    "Rooms",
+    "AC_Units",
+    "Fan_Count",
+    "Light_Count",
+    "Refrigerator",
+    "TV_Count",
+    "Washing_Machine",
+    "Other_Appliances",
+    "Location",
+    "Area_Type"
   ],
-  "selected_model": "Random Forest",
+  "excluded_columns": [
+    "Customer_ID",
+    "Previous_Month_Usage_kWh",
+    "Temperature_C",
+    "Meter_Type",
+    "Tariff_Category",
+    "Previous_Bill_BDT",
+    "Electricity_Bill_BDT"
+  ],
   "split": {
-    "train_end": "2009-09-27",
-    "validation_end": "2010-04-27",
-    "test_start": "2010-04-28",
-    "test_end": "2010-11-25",
-    "observed_train_rows": 981,
-    "observed_validation_rows": 207,
-    "observed_test_rows": 202
+    "training_rows": 800,
+    "test_rows": 200,
+    "random_state": 42,
+    "cross_validation_folds": 5
   },
-  "baseline": {
-    "name": "Previous day",
-    "test": {
-      "mae": 4.5636,
-      "mse": 42.579,
-      "rmse": 6.5253,
-      "r2": 0.203
-    }
+  "selected_model": "Linear Regression",
+  "selected_variant": "Base Linear Regression",
+  "optimization": {
+    "method": "GridSearchCV on training data only",
+    "base_cv_mae": 21.7772,
+    "best_cv_mae": 21.7772,
+    "best_parameters": {
+      "model__fit_intercept": true,
+      "model__positive": false
+    },
+    "improved": false,
+    "candidates": [
+      {
+        "parameters": {
+          "model__fit_intercept": true,
+          "model__positive": false
+        },
+        "cv_mae": 21.7772
+      },
+      {
+        "parameters": {
+          "model__fit_intercept": true,
+          "model__positive": true
+        },
+        "cv_mae": 21.8027
+      },
+      {
+        "parameters": {
+          "model__fit_intercept": false,
+          "model__positive": false
+        },
+        "cv_mae": 67.2156
+      },
+      {
+        "parameters": {
+          "model__fit_intercept": false,
+          "model__positive": true
+        },
+        "cv_mae": 67.2156
+      }
+    ],
+    "conclusion": "Tuning did not reduce cross-validation MAE. Retained baseline settings."
   },
   "models": [
     {
-      "name": "Linear Regression",
-      "validation_before": {
-        "mae": 4.8473,
-        "mse": 40.6406,
-        "rmse": 6.375,
-        "r2": 0.1984
-      },
-      "validation_after": {
-        "mae": 4.8473,
-        "mse": 40.6406,
-        "rmse": 6.375,
-        "r2": 0.1984
-      },
-      "tuned_params": {},
-      "using_tuned": true,
-      "validation_selected": {
-        "mae": 4.8473,
-        "mse": 40.6406,
-        "rmse": 6.375,
-        "r2": 0.1984
+      "name": "Base Linear Regression",
+      "cv_mae": 21.7772,
+      "parameters": {
+        "fit_intercept": true,
+        "positive": false
       },
       "test": {
-        "mae": 4.199,
-        "mse": 29.8829,
-        "rmse": 5.4665,
-        "r2": 0.4406
+        "mae": 21.5988,
+        "mse": 724.3373,
+        "rmse": 26.9135,
+        "r2": 0.9402
       },
       "high_usage_test": {
-        "accuracy": 0.7673,
-        "precision": 0.6818,
-        "recall": 0.6338
+        "accuracy": 0.96,
+        "precision": 0.9565,
+        "recall": 0.9735
       }
     },
     {
-      "name": "Random Forest",
-      "validation_before": {
-        "mae": 4.5237,
-        "mse": 35.6158,
-        "rmse": 5.9679,
-        "r2": 0.2975
-      },
-      "validation_after": {
-        "mae": 4.4674,
-        "mse": 35.0705,
-        "rmse": 5.922,
-        "r2": 0.3083
-      },
-      "tuned_params": {
-        "max_depth": 8,
-        "min_samples_leaf": 8
-      },
-      "using_tuned": true,
-      "validation_selected": {
-        "mae": 4.4674,
-        "mse": 35.0705,
-        "rmse": 5.922,
-        "r2": 0.3083
+      "name": "Tuned Linear Regression",
+      "cv_mae": 21.7772,
+      "parameters": {
+        "fit_intercept": true,
+        "positive": false
       },
       "test": {
-        "mae": 3.8342,
-        "mse": 27.0216,
-        "rmse": 5.1982,
-        "r2": 0.4942
+        "mae": 21.5988,
+        "mse": 724.3373,
+        "rmse": 26.9135,
+        "r2": 0.9402
       },
       "high_usage_test": {
-        "accuracy": 0.7723,
-        "precision": 0.6812,
-        "recall": 0.662
+        "accuracy": 0.96,
+        "precision": 0.9565,
+        "recall": 0.9735
       }
     }
   ],
   "high_usage_classification": {
-    "threshold_kwh": 25.305633,
-    "definition": "High usage = daily kWh >= median observed training consumption. Actual and predicted kWh use the same fixed threshold.",
-    "note": "Secondary classification derived from regression predictions; accuracy, precision and recall do not measure regression accuracy.",
-    "test_positive_days": 71,
-    "test_total_days": 202
+    "threshold_kwh": 351.6,
+    "definition": "High usage = monthly kWh >= training median. Secondary classification from regression predictions, not regression accuracy."
   },
-  "recursive_30_day_test": {
-    "metrics": {
-      "mae": 4.3941,
-      "mse": 32.7828,
-      "rmse": 5.7256,
-      "r2": -0.0001
+  "input_schema": [
+    {
+      "name": "Household_Size",
+      "label": "Family members",
+      "type": "number",
+      "min": 1,
+      "max": 20
     },
-    "windows": [
-      {
-        "start": "2010-04-28",
-        "actual_kwh": 758.826,
-        "predicted_kwh": 716.878
-      },
-      {
-        "start": "2010-05-28",
-        "actual_kwh": 716.303,
-        "predicted_kwh": 713.845
-      },
-      {
-        "start": "2010-06-27",
-        "actual_kwh": 568.043,
-        "predicted_kwh": 585.346
-      },
-      {
-        "start": "2010-08-26",
-        "actual_kwh": 692.657,
-        "predicted_kwh": 524.193
-      },
-      {
-        "start": "2010-10-25",
-        "actual_kwh": 825.82,
-        "predicted_kwh": 949.256
-      }
-    ]
+    {
+      "name": "Rooms",
+      "label": "Rooms",
+      "type": "number",
+      "min": 1,
+      "max": 30
+    },
+    {
+      "name": "AC_Units",
+      "label": "Air conditioners",
+      "type": "number",
+      "min": 0,
+      "max": 20
+    },
+    {
+      "name": "Fan_Count",
+      "label": "Fans",
+      "type": "number",
+      "min": 0,
+      "max": 100
+    },
+    {
+      "name": "Light_Count",
+      "label": "Lights",
+      "type": "number",
+      "min": 0,
+      "max": 200
+    },
+    {
+      "name": "Refrigerator",
+      "label": "Refrigerator (0 = no, 1 = yes)",
+      "type": "number",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "TV_Count",
+      "label": "Televisions",
+      "type": "number",
+      "min": 0,
+      "max": 30
+    },
+    {
+      "name": "Washing_Machine",
+      "label": "Washing machine (0 = no, 1 = yes)",
+      "type": "number",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "Other_Appliances",
+      "label": "Other appliances",
+      "type": "number",
+      "min": 0,
+      "max": 100
+    },
+    {
+      "name": "Location",
+      "label": "Location",
+      "type": "select",
+      "options": [
+        "Barishal",
+        "Chattogram",
+        "Dhaka",
+        "Khulna",
+        "Mymensingh",
+        "Rajshahi",
+        "Rangpur",
+        "Savar",
+        "Sylhet"
+      ]
+    },
+    {
+      "name": "Area_Type",
+      "label": "Area type",
+      "type": "select",
+      "options": [
+        "Rural",
+        "Semi-Urban",
+        "Urban"
+      ]
+    }
+  ],
+  "sample_input": {
+    "Household_Size": 5,
+    "Rooms": 4,
+    "AC_Units": 0,
+    "Fan_Count": 6,
+    "Light_Count": 8,
+    "Refrigerator": 0,
+    "TV_Count": 1,
+    "Washing_Machine": 0,
+    "Other_Appliances": 6,
+    "Location": "Sylhet",
+    "Area_Type": "Urban"
   },
-  "evaluation_note": "One-day test uses actual past readings. 30-day test uses recursive forecasts. Selection uses validation MAE only; production model is subsequently refit on all observed dates.",
-  "preprocessing_note": "Read data/daily.csv, sort dates, remove duplicate dates and handle invalid/missing kWh using the preceding 7-day median. The imputed column identifies filled days, which are excluded as fitting/evaluation targets. Features use past values only. Original Kaggle data was aggregated to daily kWh before creating this CSV.",
+  "preprocessing_note": "Remove duplicates; coerce invalid numeric values to missing. Impute numeric features with training medians, standardize them, and one-hot encode location/area type. All fitted preprocessing stays inside the cross-validation pipeline.",
   "limitations": [
-    "One historical French household; performance may differ for other homes.",
-    "No weather or occupancy inputs; long forecasts accumulate error.",
-    "Bills use editable illustrative tariffs, not verified utility rates."
+    "Bangladesh locations; collection method is undocumented by the publisher.",
+    "This estimates monthly consumption for a household profile; it is not a dated time-series forecast.",
+    "The bill uses an illustrative flat BDT tariff, not verified provider slabs/taxes."
   ]
 }

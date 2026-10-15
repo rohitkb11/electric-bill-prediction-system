@@ -8,3 +8,4 @@ main{max-width:1260px;margin:auto;padding:42px 36px 0}.intro{margin-bottom:28px}
 @media(max-width:900px){.layout{grid-template-columns:260px 1fr}.panel{padding:19px}.chart-heading{align-items:flex-start;flex-direction:column}.stat{padding:18px}.stat h2{font-size:27px}.brand-sub{display:none}}
 @media(max-width:680px){.topbar{height:68px;padding:0 20px}.topbar>.tag{display:none}main{padding:30px 18px 0}.layout{grid-template-columns:1fr}.controls{order:0}.results{order:1}.chart{height:210px}.evaluation-heading{align-items:flex-start;flex-direction:column}.stats{gap:12px}.stat{padding:18px 14px}.stat h2{font-size:25px}footer{flex-direction:column;gap:8px}.intro br{display:none}}
 .model-plots img{display:block;width:100%;height:auto;margin:20px 0 28px;border:1px solid var(--line);border-radius:8px}
+.chart-panel img{display:block;width:100%;height:auto;margin-top:18px}.controls .two-fields label{line-height:1.5}

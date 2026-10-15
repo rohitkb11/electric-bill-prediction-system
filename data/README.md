@@ -1,15 +1,25 @@
-# Dataset provenance
+# Dataset collection and provenance
 
-Source: [Kaggle: Household Electric Power Consumption](https://www.kaggle.com/datasets/uciml/electric-power-consumption-data-set), originally the [UCI Individual Household Electric Power Consumption dataset](https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption).
+The project uses one file: **household_electricity.csv**.
 
-The source measures one household in Sceaux, France, from December 2006 to November 2010. It is not an Indian household dataset and does not contain electricity bills or tariff labels. The UI uses editable illustrative rupee tariffs to demonstrate bill estimation.
+- Source: https://www.kaggle.com/datasets/armanahmedtaief/electricity-bill-prediction
+- Publisher: Arman Ahmed Taief.
+- Original filename: Electricity Bill Prediction.csv (renamed locally; original columns retained).
+- Size: 1,000 household records and 19 columns.
+- Listed license: CC0 / Public Domain.
+- Geography: Bangladesh. Recorded bill amounts are BDT.
+- Collection method: not documented by the publisher. Do not describe it as verified real survey data.
 
-Citation: Hebrail, G. & Berard, A. (2006). Individual Household Electric Power Consumption [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C58K54. Licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The included `daily.csv` adapts the source through aggregation, coverage normalization and past-only missing-day filling; no endorsement by the dataset creators is implied.
+## Features used
 
-## One CSV dataset
+Location, Area_Type, Household_Size, Rooms, AC_Units, Fan_Count, Light_Count, Refrigerator, TV_Count, Washing_Machine and Other_Appliances.
 
-Both training and the dashboard read **`data/daily.csv`** directly. It contains 1,440 rows and three columns: `date` (YYYY-MM-DD), `kwh` (daily consumption), and `imputed` (True for a filled value). The original minute-level file and ZIP archive are not needed.
+Refrigerator and Washing_Machine are 0/1 presence flags, not counts. Other appliance fields are counts. Target: Monthly_Usage_kWh.
 
-Before this CSV was created, minute-level kW readings were summed and divided by 60 to obtain daily kWh. Days with at least 90% valid readings were normalized for coverage; the other 22 days were filled using the preceding seven-day median and flagged. This preparation can introduce error. Filled days provide history but are excluded as fitting/evaluation targets.
+## Columns excluded from inputs
 
-Run `python ml/train.py` in your Python environment to train directly from the CSV. The script sorts dates, removes duplicate dates and handles any additional invalid/missing readings. It does not create another dataset or overwrite the CSV.
+Customer_ID, Monthly_Usage_kWh (the target), Previous_Month_Usage_kWh, Temperature_C, Meter_Type, Tariff_Category, Previous_Bill_BDT and Electricity_Bill_BDT.
+
+The selected model uses only the household details entered in the form. Previous usage and bills are unnecessary for that workflow. Temperature/meter/tariff fields are also omitted to keep the inputs simple. Bill amounts are calculated from predicted kWh and a user-entered rate, not learned from bill labels.
+
+The CSV is included so training requires no download or ZIP extraction. To collect it again, download the named CSV from the source and save it with the local filename above.

@@ -3,45 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Forecast household electricity consumption and estimate your bill using machine learning.">
+  <meta name="description" content="Estimate monthly electricity consumption from household details using Linear Regression.">
   <title>Electric Bill Prediction System</title>
   <link rel="stylesheet" href="/style.css">
   <script src="/app.js" defer></script>
 </head>
 <body>
-  <header class="topbar"><a class="brand" href="/"> <span class="brand-icon">ϟ</span> WattWise <span class="brand-sub">AI/ML MINI PROJECT</span></a><span class="tag">Express + Machine Learning</span></header>
+  <header class="topbar"><a class="brand" href="/"><span class="brand-icon">ϟ</span> WattWise <span class="brand-sub">AI/ML MINI PROJECT</span></a><span class="tag">Express + Linear Regression</span></header>
   <main>
-    <div class="intro"><p class="eyebrow">YOUR ENERGY, AHEAD OF TIME</p><h1>A clearer view of your <br><span>next electricity bill.</span></h1><p>Explore your usage, forecast consumption and plan your budget.</p></div>
-    <div class="notice"><span class="dot"></span><p><strong>Historical dataset demo</strong> · Trained on one French household (2006–2010). Editable rupee rates are illustrative. Your household’s results may differ.</p></div>
+    <div class="intro"><p class="eyebrow">YOUR HOME. YOUR ENERGY ESTIMATE.</p><h1>A clearer view of your <br><span>monthly electricity bill.</span></h1><p>Enter your household details to estimate monthly consumption and cost.</p></div>
+    <div class="notice"><span class="dot"></span><p><strong>Household profile demo</strong> · Trained on a Kaggle CSV with 1,000 Bangladesh household records. Bill estimates use your flat tariff in BDT.</p></div>
     <section class="layout">
       <form id="forecast-form" class="panel controls">
-        <div class="panel-heading"><span class="step">01</span><h2>Set up your forecast</h2></div>
-        <label for="days">Forecast period</label><select id="days"><option value="7">Next 7 days</option><option value="14">Next 14 days</option><option value="30" selected>Next 30 days</option></select>
-        <div class="two-fields"><div><label for="rate">Rate / kWh (₹)</label><input id="rate" type="number" min="0" max="1000" step="0.01" value="7" required></div><div><label for="fixed">Fixed charge (₹)</label><input id="fixed" type="number" min="0" max="100000" step="0.01" value="100" required></div></div>
-        <p class="hint">Estimated bill = forecast kWh × rate + one fixed charge for the selected period.</p>
-        <details><summary>Use your own daily readings</summary><label for="last-date">Date of final reading</label><input id="last-date" type="date" min="1900-01-01" max="2099-12-31" required><label for="readings">Daily kWh, oldest to newest</label><textarea id="readings" rows="5" required aria-describedby="readings-help"></textarea><p id="readings-help" class="hint">At least 28 consecutive days, separated by commas or newlines. Include every day.</p><button id="reset" class="text-button" type="button">Restore sample readings</button></details>
-        <button class="primary" id="predict" type="submit">Generate forecast <span>↗</span></button>
-        <p id="status" role="status" aria-live="polite">Loading dataset…</p>
+        <div class="panel-heading"><span class="step">01</span><h2>Your household</h2></div>
+        <div class="two-fields" id="household-fields"></div>
+        <div class="two-fields"><div><label for="rate">Rate / kWh (BDT)</label><input id="rate" type="number" min="0" max="1000" step="0.01" value="8" required></div><div><label for="fixed">Fixed charge (BDT)</label><input id="fixed" type="number" min="0" max="100000" step="0.01" value="100" required></div></div>
+        <p class="hint">Estimated bill = monthly kWh × your rate + one monthly fixed charge. Provider slabs and taxes are not included.</p>
+        <button id="reset" class="text-button" type="button">Restore sample household</button>
+        <button class="primary" id="predict" type="submit">Estimate monthly bill <span>↗</span></button>
+        <p id="status" role="status" aria-live="polite">Loading model…</p>
       </form>
       <div class="results">
-        <section class="stats" aria-label="Forecast summary">
-          <article class="stat"><p>Predicted consumption</p><h2><span id="total-kwh">—</span> <small>kWh</small></h2><span id="period-note">For the selected period</span></article>
-          <article class="stat bill-stat"><p>Estimated electricity bill</p><h2 id="bill-total">—</h2><span id="bill-note">Based on your tariff settings</span></article>
+        <section class="stats" aria-label="Prediction summary">
+          <article class="stat"><p>Monthly consumption</p><h2><span id="total-kwh">—</span> <small>kWh</small></h2><span>Estimated from your household profile</span></article>
+          <article class="stat bill-stat"><p>Estimated monthly bill</p><h2 id="bill-total">—</h2><span id="bill-note">Based on your tariff settings</span></article>
         </section>
-        <section class="panel chart-panel"><div class="chart-heading"><div><p class="eyebrow">CONSUMPTION OVERVIEW</p><h2>Your usage, past & predicted</h2></div><div class="legend"><span>● History</span><span>● Forecast</span></div></div><div id="chart" class="chart" role="img" aria-label="Daily electricity consumption chart"></div><p class="hint" id="chart-note">Daily electricity consumption in kWh</p></section>
+        <section class="panel chart-panel"><p class="eyebrow">HELD-OUT TEST RESULTS</p><h2>How well does the model predict?</h2><img src="/plots/actual-vs-predicted.png" alt="Actual versus predicted monthly kWh for 200 held-out households, with a perfect-prediction reference line."><p class="hint">Each point is one test household. Points closer to the dashed line have smaller prediction errors.</p></section>
+        <section class="panel evaluation"><p class="eyebrow">THE MODEL</p><h2>Linear Regression</h2><p class="hint" id="data-note"></p><p class="hint" id="split-note"></p><p class="hint" id="preprocessing-note"></p><a href="https://www.kaggle.com/datasets/armanahmedtaief/electricity-bill-prediction" target="_blank" rel="noreferrer">View Kaggle dataset ↗</a></section>
       </div>
     </section>
-    <section class="panel evaluation"><div class="evaluation-heading"><div><p class="eyebrow">THE MACHINE LEARNING BEHIND IT</p><h2>Model comparison</h2></div><span class="tag" id="selected-model">Loading model…</span></div><p class="hint">Held-out next-day results. Lower MAE/RMSE is better; higher R² is better. The model is selected using validation data.</p><div class="table-wrap"><table><thead><tr><th>Model</th><th>Validation MAE, before tuning</th><th>Validation MAE, after tuning</th><th>Test MAE (kWh)</th><th>Test RMSE (kWh)</th><th>Test R²</th></tr></thead><tbody id="model-rows"></tbody></table></div><p class="hint" id="evaluation-note"></p><details><summary>Dataset preparation & evaluation</summary><p id="data-note"></p><p id="split-note"></p><p id="preprocessing-note"></p><p>Past usage and calendar features feed the model. Multi-day forecasts reuse predictions as inputs, so error can accumulate. Production training uses all observed dates after evaluation.</p><a href="https://www.kaggle.com/datasets/uciml/electric-power-consumption-data-set" target="_blank" rel="noreferrer">View original Kaggle dataset ↗</a></details></section>
+    <section class="panel evaluation"><div class="evaluation-heading"><div><p class="eyebrow">MODEL OPTIMIZATION</p><h2>Baseline & tuning results</h2></div><span class="tag" id="selected-model">Linear Regression</span></div><p class="hint">Five-fold cross-validation on 800 training households chooses settings. Both variants are evaluated on the same 200 test households. Lower error and higher R² are better.</p><div class="table-wrap"><table><thead><tr><th>Variant</th><th>CV MAE (kWh)</th><th>Test MAE (kWh)</th><th>Test MSE (kWh²)</th><th>Test RMSE (kWh)</th><th>Test R²</th></tr></thead><tbody id="model-rows"></tbody></table></div><p class="hint" id="optimization-note"></p></section>
     <section class="panel evaluation model-plots">
-      <p class="eyebrow">MATPLOTLIB EVALUATION GRAPHS</p>
-      <h2>Linear Regression vs Random Forest</h2>
-      <p class="hint" id="comparison-summary">Comparing held-out next-day predictions from both models.</p>
-      <img src="/plots/regression-comparison.png" alt="Matplotlib bar graphs comparing test MSE and R squared for Linear Regression and Random Forest.">
-      <h2>High-usage detection: accuracy, precision & recall</h2>
-      <p class="hint" id="classification-note">These classification scores use a training-data threshold to label actual and predicted consumption as high or normal. They are separate from regression performance.</p>
-      <img src="/plots/high-usage-comparison.png" alt="Matplotlib grouped bar graph comparing accuracy, precision and recall for derived high-usage detection.">
+      <p class="eyebrow">MATPLOTLIB EVALUATION GRAPHS</p><h2>Linear Regression: base vs tuned</h2>
+      <img src="/plots/regression-comparison.png" alt="MSE and R squared comparison of base and tuned Linear Regression on held-out monthly consumption.">
+      <details><summary>Secondary high-usage detection scores</summary><p class="hint" id="classification-note"></p><img src="/plots/high-usage-comparison.png" alt="Accuracy, precision and recall for high-usage labels derived from monthly regression predictions."></details>
     </section>
-    <footer><span>WattWise · Electricity Consumption & Bill Prediction</span><span>Python ML · Express backend · Simple web frontend</span></footer>
+    <footer><span>WattWise · Household Electricity & Bill Prediction</span><span>Linear Regression · Express · Matplotlib</span></footer>
   </main>
 </body>
 </html>

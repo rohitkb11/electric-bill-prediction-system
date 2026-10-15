@@ -1,0 +1,802 @@
+[
+  {
+    "actual_kwh": 639.3,
+    "predicted_kwh": 538.431
+  },
+  {
+    "actual_kwh": 322.2,
+    "predicted_kwh": 344.629
+  },
+  {
+    "actual_kwh": 321.6,
+    "predicted_kwh": 341.448
+  },
+  {
+    "actual_kwh": 273.1,
+    "predicted_kwh": 274.973
+  },
+  {
+    "actual_kwh": 402.5,
+    "predicted_kwh": 400.913
+  },
+  {
+    "actual_kwh": 415.5,
+    "predicted_kwh": 412.817
+  },
+  {
+    "actual_kwh": 505.4,
+    "predicted_kwh": 540.98
+  },
+  {
+    "actual_kwh": 280.2,
+    "predicted_kwh": 303.142
+  },
+  {
+    "actual_kwh": 266.1,
+    "predicted_kwh": 263.368
+  },
+  {
+    "actual_kwh": 297.6,
+    "predicted_kwh": 316.573
+  },
+  {
+    "actual_kwh": 420.5,
+    "predicted_kwh": 421.563
+  },
+  {
+    "actual_kwh": 280.7,
+    "predicted_kwh": 263.627
+  },
+  {
+    "actual_kwh": 136.8,
+    "predicted_kwh": 148.153
+  },
+  {
+    "actual_kwh": 230.9,
+    "predicted_kwh": 250.864
+  },
+  {
+    "actual_kwh": 488.7,
+    "predicted_kwh": 509.489
+  },
+  {
+    "actual_kwh": 301.9,
+    "predicted_kwh": 296.473
+  },
+  {
+    "actual_kwh": 405.2,
+    "predicted_kwh": 372.732
+  },
+  {
+    "actual_kwh": 422.1,
+    "predicted_kwh": 467.907
+  },
+  {
+    "actual_kwh": 519.9,
+    "predicted_kwh": 484.581
+  },
+  {
+    "actual_kwh": 449.8,
+    "predicted_kwh": 460.39
+  },
+  {
+    "actual_kwh": 388.9,
+    "predicted_kwh": 420.911
+  },
+  {
+    "actual_kwh": 429.4,
+    "predicted_kwh": 432.298
+  },
+  {
+    "actual_kwh": 464.0,
+    "predicted_kwh": 455.619
+  },
+  {
+    "actual_kwh": 284.1,
+    "predicted_kwh": 308.575
+  },
+  {
+    "actual_kwh": 260.8,
+    "predicted_kwh": 279.67
+  },
+  {
+    "actual_kwh": 344.4,
+    "predicted_kwh": 371.194
+  },
+  {
+    "actual_kwh": 558.8,
+    "predicted_kwh": 522.366
+  },
+  {
+    "actual_kwh": 183.2,
+    "predicted_kwh": 214.149
+  },
+  {
+    "actual_kwh": 319.5,
+    "predicted_kwh": 299.825
+  },
+  {
+    "actual_kwh": 400.5,
+    "predicted_kwh": 354.957
+  },
+  {
+    "actual_kwh": 350.2,
+    "predicted_kwh": 354.554
+  },
+  {
+    "actual_kwh": 486.2,
+    "predicted_kwh": 516.298
+  },
+  {
+    "actual_kwh": 529.7,
+    "predicted_kwh": 499.458
+  },
+  {
+    "actual_kwh": 517.1,
+    "predicted_kwh": 540.33
+  },
+  {
+    "actual_kwh": 475.7,
+    "predicted_kwh": 478.776
+  },
+  {
+    "actual_kwh": 396.2,
+    "predicted_kwh": 394.709
+  },
+  {
+    "actual_kwh": 373.4,
+    "predicted_kwh": 352.411
+  },
+  {
+    "actual_kwh": 438.9,
+    "predicted_kwh": 445.018
+  },
+  {
+    "actual_kwh": 360.3,
+    "predicted_kwh": 303.065
+  },
+  {
+    "actual_kwh": 394.6,
+    "predicted_kwh": 375.354
+  },
+  {
+    "actual_kwh": 260.6,
+    "predicted_kwh": 218.078
+  },
+  {
+    "actual_kwh": 483.5,
+    "predicted_kwh": 526.154
+  },
+  {
+    "actual_kwh": 366.4,
+    "predicted_kwh": 398.297
+  },
+  {
+    "actual_kwh": 274.5,
+    "predicted_kwh": 266.659
+  },
+  {
+    "actual_kwh": 250.5,
+    "predicted_kwh": 253.135
+  },
+  {
+    "actual_kwh": 423.1,
+    "predicted_kwh": 404.5
+  },
+  {
+    "actual_kwh": 430.5,
+    "predicted_kwh": 428.565
+  },
+  {
+    "actual_kwh": 337.3,
+    "predicted_kwh": 347.517
+  },
+  {
+    "actual_kwh": 529.9,
+    "predicted_kwh": 555.678
+  },
+  {
+    "actual_kwh": 436.1,
+    "predicted_kwh": 465.463
+  },
+  {
+    "actual_kwh": 385.3,
+    "predicted_kwh": 417.464
+  },
+  {
+    "actual_kwh": 409.1,
+    "predicted_kwh": 460.771
+  },
+  {
+    "actual_kwh": 256.9,
+    "predicted_kwh": 234.136
+  },
+  {
+    "actual_kwh": 385.8,
+    "predicted_kwh": 356.507
+  },
+  {
+    "actual_kwh": 320.1,
+    "predicted_kwh": 319.858
+  },
+  {
+    "actual_kwh": 382.4,
+    "predicted_kwh": 389.588
+  },
+  {
+    "actual_kwh": 395.2,
+    "predicted_kwh": 413.323
+  },
+  {
+    "actual_kwh": 468.8,
+    "predicted_kwh": 486.813
+  },
+  {
+    "actual_kwh": 298.0,
+    "predicted_kwh": 307.391
+  },
+  {
+    "actual_kwh": 178.7,
+    "predicted_kwh": 200.784
+  },
+  {
+    "actual_kwh": 576.5,
+    "predicted_kwh": 553.997
+  },
+  {
+    "actual_kwh": 243.2,
+    "predicted_kwh": 256.575
+  },
+  {
+    "actual_kwh": 443.8,
+    "predicted_kwh": 414.795
+  },
+  {
+    "actual_kwh": 354.5,
+    "predicted_kwh": 333.35
+  },
+  {
+    "actual_kwh": 210.1,
+    "predicted_kwh": 230.999
+  },
+  {
+    "actual_kwh": 476.3,
+    "predicted_kwh": 496.473
+  },
+  {
+    "actual_kwh": 350.7,
+    "predicted_kwh": 360.533
+  },
+  {
+    "actual_kwh": 324.8,
+    "predicted_kwh": 341.943
+  },
+  {
+    "actual_kwh": 308.8,
+    "predicted_kwh": 326.8
+  },
+  {
+    "actual_kwh": 191.5,
+    "predicted_kwh": 199.089
+  },
+  {
+    "actual_kwh": 414.8,
+    "predicted_kwh": 394.912
+  },
+  {
+    "actual_kwh": 443.7,
+    "predicted_kwh": 416.957
+  },
+  {
+    "actual_kwh": 296.8,
+    "predicted_kwh": 324.635
+  },
+  {
+    "actual_kwh": 347.7,
+    "predicted_kwh": 333.883
+  },
+  {
+    "actual_kwh": 383.8,
+    "predicted_kwh": 401.732
+  },
+  {
+    "actual_kwh": 444.8,
+    "predicted_kwh": 414.569
+  },
+  {
+    "actual_kwh": 244.5,
+    "predicted_kwh": 252.822
+  },
+  {
+    "actual_kwh": 402.5,
+    "predicted_kwh": 372.749
+  },
+  {
+    "actual_kwh": 518.0,
+    "predicted_kwh": 538.899
+  },
+  {
+    "actual_kwh": 598.0,
+    "predicted_kwh": 579.718
+  },
+  {
+    "actual_kwh": 528.8,
+    "predicted_kwh": 544.821
+  },
+  {
+    "actual_kwh": 266.3,
+    "predicted_kwh": 260.931
+  },
+  {
+    "actual_kwh": 389.5,
+    "predicted_kwh": 411.666
+  },
+  {
+    "actual_kwh": 245.5,
+    "predicted_kwh": 255.25
+  },
+  {
+    "actual_kwh": 552.9,
+    "predicted_kwh": 523.892
+  },
+  {
+    "actual_kwh": 505.4,
+    "predicted_kwh": 541.997
+  },
+  {
+    "actual_kwh": 431.9,
+    "predicted_kwh": 473.408
+  },
+  {
+    "actual_kwh": 333.9,
+    "predicted_kwh": 331.605
+  },
+  {
+    "actual_kwh": 514.8,
+    "predicted_kwh": 530.06
+  },
+  {
+    "actual_kwh": 695.1,
+    "predicted_kwh": 613.779
+  },
+  {
+    "actual_kwh": 316.6,
+    "predicted_kwh": 348.355
+  },
+  {
+    "actual_kwh": 460.9,
+    "predicted_kwh": 444.345
+  },
+  {
+    "actual_kwh": 256.7,
+    "predicted_kwh": 297.62
+  },
+  {
+    "actual_kwh": 428.7,
+    "predicted_kwh": 398.455
+  },
+  {
+    "actual_kwh": 323.0,
+    "predicted_kwh": 314.218
+  },
+  {
+    "actual_kwh": 237.0,
+    "predicted_kwh": 237.444
+  },
+  {
+    "actual_kwh": 333.2,
+    "predicted_kwh": 303.431
+  },
+  {
+    "actual_kwh": 454.5,
+    "predicted_kwh": 490.285
+  },
+  {
+    "actual_kwh": 265.4,
+    "predicted_kwh": 239.623
+  },
+  {
+    "actual_kwh": 425.7,
+    "predicted_kwh": 415.725
+  },
+  {
+    "actual_kwh": 415.1,
+    "predicted_kwh": 437.745
+  },
+  {
+    "actual_kwh": 522.9,
+    "predicted_kwh": 491.766
+  },
+  {
+    "actual_kwh": 434.3,
+    "predicted_kwh": 380.549
+  },
+  {
+    "actual_kwh": 508.5,
+    "predicted_kwh": 559.437
+  },
+  {
+    "actual_kwh": 373.5,
+    "predicted_kwh": 383.6
+  },
+  {
+    "actual_kwh": 477.3,
+    "predicted_kwh": 454.423
+  },
+  {
+    "actual_kwh": 420.9,
+    "predicted_kwh": 389.821
+  },
+  {
+    "actual_kwh": 201.3,
+    "predicted_kwh": 204.953
+  },
+  {
+    "actual_kwh": 284.5,
+    "predicted_kwh": 269.651
+  },
+  {
+    "actual_kwh": 422.7,
+    "predicted_kwh": 470.933
+  },
+  {
+    "actual_kwh": 431.3,
+    "predicted_kwh": 394.893
+  },
+  {
+    "actual_kwh": 267.7,
+    "predicted_kwh": 272.624
+  },
+  {
+    "actual_kwh": 371.3,
+    "predicted_kwh": 359.297
+  },
+  {
+    "actual_kwh": 413.0,
+    "predicted_kwh": 411.487
+  },
+  {
+    "actual_kwh": 347.5,
+    "predicted_kwh": 347.287
+  },
+  {
+    "actual_kwh": 288.7,
+    "predicted_kwh": 282.846
+  },
+  {
+    "actual_kwh": 672.2,
+    "predicted_kwh": 636.86
+  },
+  {
+    "actual_kwh": 518.1,
+    "predicted_kwh": 534.392
+  },
+  {
+    "actual_kwh": 220.6,
+    "predicted_kwh": 230.389
+  },
+  {
+    "actual_kwh": 411.3,
+    "predicted_kwh": 446.888
+  },
+  {
+    "actual_kwh": 503.7,
+    "predicted_kwh": 535.037
+  },
+  {
+    "actual_kwh": 316.7,
+    "predicted_kwh": 325.827
+  },
+  {
+    "actual_kwh": 270.3,
+    "predicted_kwh": 260.415
+  },
+  {
+    "actual_kwh": 290.4,
+    "predicted_kwh": 305.084
+  },
+  {
+    "actual_kwh": 259.9,
+    "predicted_kwh": 283.287
+  },
+  {
+    "actual_kwh": 442.7,
+    "predicted_kwh": 471.887
+  },
+  {
+    "actual_kwh": 580.9,
+    "predicted_kwh": 610.792
+  },
+  {
+    "actual_kwh": 373.4,
+    "predicted_kwh": 375.703
+  },
+  {
+    "actual_kwh": 292.3,
+    "predicted_kwh": 267.09
+  },
+  {
+    "actual_kwh": 288.3,
+    "predicted_kwh": 266.017
+  },
+  {
+    "actual_kwh": 444.3,
+    "predicted_kwh": 444.246
+  },
+  {
+    "actual_kwh": 344.1,
+    "predicted_kwh": 339.264
+  },
+  {
+    "actual_kwh": 610.6,
+    "predicted_kwh": 598.747
+  },
+  {
+    "actual_kwh": 229.7,
+    "predicted_kwh": 242.094
+  },
+  {
+    "actual_kwh": 502.6,
+    "predicted_kwh": 502.921
+  },
+  {
+    "actual_kwh": 370.6,
+    "predicted_kwh": 364.874
+  },
+  {
+    "actual_kwh": 619.3,
+    "predicted_kwh": 624.119
+  },
+  {
+    "actual_kwh": 498.3,
+    "predicted_kwh": 465.668
+  },
+  {
+    "actual_kwh": 344.1,
+    "predicted_kwh": 354.765
+  },
+  {
+    "actual_kwh": 264.9,
+    "predicted_kwh": 281.45
+  },
+  {
+    "actual_kwh": 419.3,
+    "predicted_kwh": 425.769
+  },
+  {
+    "actual_kwh": 314.7,
+    "predicted_kwh": 289.648
+  },
+  {
+    "actual_kwh": 374.7,
+    "predicted_kwh": 382.636
+  },
+  {
+    "actual_kwh": 216.0,
+    "predicted_kwh": 226.831
+  },
+  {
+    "actual_kwh": 511.0,
+    "predicted_kwh": 549.861
+  },
+  {
+    "actual_kwh": 452.5,
+    "predicted_kwh": 423.122
+  },
+  {
+    "actual_kwh": 410.7,
+    "predicted_kwh": 420.171
+  },
+  {
+    "actual_kwh": 390.8,
+    "predicted_kwh": 454.536
+  },
+  {
+    "actual_kwh": 332.6,
+    "predicted_kwh": 296.401
+  },
+  {
+    "actual_kwh": 516.7,
+    "predicted_kwh": 557.204
+  },
+  {
+    "actual_kwh": 524.6,
+    "predicted_kwh": 559.24
+  },
+  {
+    "actual_kwh": 494.5,
+    "predicted_kwh": 465.072
+  },
+  {
+    "actual_kwh": 421.6,
+    "predicted_kwh": 457.793
+  },
+  {
+    "actual_kwh": 267.8,
+    "predicted_kwh": 310.078
+  },
+  {
+    "actual_kwh": 440.7,
+    "predicted_kwh": 503.034
+  },
+  {
+    "actual_kwh": 417.1,
+    "predicted_kwh": 415.659
+  },
+  {
+    "actual_kwh": 462.4,
+    "predicted_kwh": 478.977
+  },
+  {
+    "actual_kwh": 348.9,
+    "predicted_kwh": 399.941
+  },
+  {
+    "actual_kwh": 279.0,
+    "predicted_kwh": 237.573
+  },
+  {
+    "actual_kwh": 438.9,
+    "predicted_kwh": 421.796
+  },
+  {
+    "actual_kwh": 306.2,
+    "predicted_kwh": 314.548
+  },
+  {
+    "actual_kwh": 561.9,
+    "predicted_kwh": 550.794
+  },
+  {
+    "actual_kwh": 448.1,
+    "predicted_kwh": 381.312
+  },
+  {
+    "actual_kwh": 241.6,
+    "predicted_kwh": 249.839
+  },
+  {
+    "actual_kwh": 314.8,
+    "predicted_kwh": 315.034
+  },
+  {
+    "actual_kwh": 266.3,
+    "predicted_kwh": 268.838
+  },
+  {
+    "actual_kwh": 418.1,
+    "predicted_kwh": 438.125
+  },
+  {
+    "actual_kwh": 282.7,
+    "predicted_kwh": 274.973
+  },
+  {
+    "actual_kwh": 516.0,
+    "predicted_kwh": 529.205
+  },
+  {
+    "actual_kwh": 416.1,
+    "predicted_kwh": 381.835
+  },
+  {
+    "actual_kwh": 251.4,
+    "predicted_kwh": 251.435
+  },
+  {
+    "actual_kwh": 496.6,
+    "predicted_kwh": 484.217
+  },
+  {
+    "actual_kwh": 191.8,
+    "predicted_kwh": 195.765
+  },
+  {
+    "actual_kwh": 499.9,
+    "predicted_kwh": 542.616
+  },
+  {
+    "actual_kwh": 232.2,
+    "predicted_kwh": 231.786
+  },
+  {
+    "actual_kwh": 226.9,
+    "predicted_kwh": 235.153
+  },
+  {
+    "actual_kwh": 361.5,
+    "predicted_kwh": 377.732
+  },
+  {
+    "actual_kwh": 309.8,
+    "predicted_kwh": 313.598
+  },
+  {
+    "actual_kwh": 536.9,
+    "predicted_kwh": 500.843
+  },
+  {
+    "actual_kwh": 245.8,
+    "predicted_kwh": 254.128
+  },
+  {
+    "actual_kwh": 304.2,
+    "predicted_kwh": 323.233
+  },
+  {
+    "actual_kwh": 639.8,
+    "predicted_kwh": 662.329
+  },
+  {
+    "actual_kwh": 462.6,
+    "predicted_kwh": 444.882
+  },
+  {
+    "actual_kwh": 531.1,
+    "predicted_kwh": 553.801
+  },
+  {
+    "actual_kwh": 400.4,
+    "predicted_kwh": 417.047
+  },
+  {
+    "actual_kwh": 310.6,
+    "predicted_kwh": 282.719
+  },
+  {
+    "actual_kwh": 341.3,
+    "predicted_kwh": 335.541
+  },
+  {
+    "actual_kwh": 307.2,
+    "predicted_kwh": 334.483
+  },
+  {
+    "actual_kwh": 321.4,
+    "predicted_kwh": 294.718
+  },
+  {
+    "actual_kwh": 363.4,
+    "predicted_kwh": 342.291
+  },
+  {
+    "actual_kwh": 312.0,
+    "predicted_kwh": 294.462
+  },
+  {
+    "actual_kwh": 163.5,
+    "predicted_kwh": 192.505
+  },
+  {
+    "actual_kwh": 537.5,
+    "predicted_kwh": 509.611
+  },
+  {
+    "actual_kwh": 229.0,
+    "predicted_kwh": 231.269
+  },
+  {
+    "actual_kwh": 324.9,
+    "predicted_kwh": 285.23
+  },
+  {
+    "actual_kwh": 484.6,
+    "predicted_kwh": 423.608
+  },
+  {
+    "actual_kwh": 391.1,
+    "predicted_kwh": 408.154
+  },
+  {
+    "actual_kwh": 316.0,
+    "predicted_kwh": 291.856
+  },
+  {
+    "actual_kwh": 307.1,
+    "predicted_kwh": 340.774
+  },
+  {
+    "actual_kwh": 158.0,
+    "predicted_kwh": 189.77
+  }
+]

@@ -1,8 +1,8 @@
 # Implementation phases
 
-1. **Dataset and ML:** Read the single included `data/daily.csv`, clean daily readings, engineer past-only features, compare two models, tune, and save the model and report.
-2. **Express backend:** Serve the dashboard, validate inputs, call Python for predictions and calculate a simple bill.
-3. **Simple frontend:** Show sample readings, editable input, period and tariff controls, consumption chart, estimated bill and model metrics.
-4. **Verification and delivery:** Test billing, validation and Express/Python integration; check the dashboard; document PR12 coverage; publish the phase commits to GitHub.
+1. **Data and preprocessing:** Keep one household CSV; select household-profile features and the monthly kWh target; clean and split before fitting preprocessing.
+2. **Linear Regression:** Train the baseline, run five-fold parameter search, evaluate on held-out households, export the complete pipeline and generate Matplotlib plots.
+3. **Application:** Express validates household details, calls Python and calculates a monthly BDT bill. The plain frontend displays the household form, prediction and evaluation.
+4. **Verification and documentation:** Test the model artifact and Express integration; verify the form and graphs; document all seven PR12 stages and publish to GitHub.
 
-Keep the scope to this single-user demo. No accounts, database, microservices or frontend framework are required.
+The project requires no database, login, frontend framework, previous readings or additional model algorithms.

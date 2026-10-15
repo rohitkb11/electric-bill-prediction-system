@@ -1,22 +1,10 @@
 # Electric Bill Prediction System
 
-A simple AI/ML mini-project that forecasts daily household electricity consumption and estimates the bill. **Express** serves the API and dashboard; **Python/scikit-learn** trains and runs the model. The frontend is plain HTML, CSS and JavaScript.
+A simple AI/ML mini-project that estimates **monthly electricity consumption** from location, family size, rooms and appliances, then calculates a bill. The model is **Linear Regression**, with an Express backend and plain HTML/CSS/JavaScript frontend.
 
-## What it does
+## Run
 
-- Opens with real sample readings and a working forecast.
-- Forecasts the next 7, 14 or 30 days from at least 28 daily kWh readings.
-- Shows historical and predicted usage on a chart.
-- Estimates the bill: **predicted kWh × per-unit rate + fixed charge**.
-- Accepts your own readings, date and tariff values.
-- Shows model comparisons, evaluation metrics and tuning results.
-- Plots MSE and R² using Matplotlib, plus separate accuracy/precision/recall graphs for derived high-usage detection.
-
-No database, login, frontend build tool or external prediction service is needed.
-
-## Run locally
-
-Install Node.js 20+ and Python **3.12 or 3.13**. The trained model and single CSV dataset are included, so training is optional for the first demo.
+Use Node.js 20+ and Python 3.12 or 3.13. One CSV, the trained model and evaluation graphs are included.
 
 ```powershell
 python -m venv .venv
@@ -25,86 +13,62 @@ npm install
 npm start
 ```
 
-Open **http://localhost:3000**. On Windows, use `npm.cmd` if PowerShell blocks `npm.ps1`.
+Open http://localhost:3000. Use `npm.cmd` if PowerShell blocks `npm.ps1`.
+On macOS/Linux, use `.venv/bin/python` instead of `.venv\Scripts\python.exe`.
+Express detects `.venv` automatically; `PYTHON_PATH` and `PORT` are optional environment variables.
 
-On macOS/Linux, replace the install command with `.venv/bin/python -m pip install -r requirements.txt`. Express automatically detects `.venv`; otherwise set `PYTHON_PATH` to your Python executable. `PORT` is optional. `.env.example` documents these settings; no `.env` loader is needed.
-
-## Reproduce the ML work
+## Train again
 
 ```powershell
 .\.venv\Scripts\python.exe ml/train.py
 npm test
 ```
 
-Training and the dashboard both use **`data/daily.csv`**, the only dataset required. It contains 1,440 daily records derived from [Kaggle Household Electric Power Consumption](https://www.kaggle.com/datasets/uciml/electric-power-consumption-data-set), originally [UCI](https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption). No download, ZIP extraction or TXT conversion is needed.
+Training saves the complete preprocessing/model pipeline in `models/consumption.joblib`, evaluation and tuning details in `models/report.json`, test prediction pairs in `models/test_predictions.json`, three Matplotlib graphs in `public/plots/`, and an updated result summary in `docs/RESULTS.md`.
 
-| Column | Meaning |
-| --- | --- |
-| `date` | Reading date, YYYY-MM-DD |
-| `kwh` | Total daily electricity consumption |
-| `imputed` | Whether the daily value was filled during original dataset preparation |
-
-1. Read the CSV, sort dates, remove duplicate dates and fill invalid/missing consumption using the preceding seven-day median.
-2. Build past-only usage features (lags and rolling statistics) and calendar features.
-3. Split chronologically into 70% training, 15% validation and 15% testing. Exclude imputed targets from training and metrics.
-4. Compare Linear Regression and Random Forest. Tune Random Forest using Grid Search with four time-series folds. Retain untuned settings if validation MAE worsens. Random Forest uses bootstrap samples (bagging), random feature subsets and averaged tree predictions.
-5. Select by validation MAE, then report held-out MAE, RMSE and R² plus a previous-day baseline. Separately evaluate recursive 30-day forecasts.
-6. Refit the selected model on all observed dates for the demo. Save `models/consumption.joblib` and `models/report.json`.
-
-Training generates two Matplotlib graphs in `public/plots/`, displayed on the dashboard. Regenerate them from the saved report without retraining:
+Regenerate graphs without retraining:
 
 ```powershell
 .\.venv\Scripts\python.exe ml/plot_metrics.py
 ```
 
-**Metric meanings:** MSE (kWh², lower is better) and R² (higher is better) compare consumption regression. Accuracy, precision and recall apply to a separate high-usage label derived from each regressor's predictions: **high = daily kWh >= the median observed training consumption**. This fixed training-only threshold is applied to actual and predicted test readings. These scores measure high-usage detection, not accuracy of predicted kWh or bills. Precision and recall refer to the high-usage positive class; an undefined score is reported as zero.
+## Dataset and inputs
 
-## Small project structure
+The only dataset is **`data/household_electricity.csv`**, containing 1,000 records downloaded from [Kaggle: Electricity Bill Prediction](https://www.kaggle.com/datasets/armanahmedtaief/electricity-bill-prediction) by Arman Ahmed Taief. The listed license is CC0. Locations are in Bangladesh; the publisher does not document whether records are measured or synthetic.
 
-```text
-public/       Dashboard: index.html, style.css, app.js
-server/       Express API and bill calculation
-ml/           CSV preprocessing, training, plotting and prediction
-data/         One dataset: daily.csv, plus source attribution
-models/       Trained model and actual evaluation report
-tests/        Input validation, billing and API integration checks
-docs/         Mini-project explanation and implementation phases
-```
+Inputs: location, area type, family members, rooms, ACs, fans, lights, refrigerator presence, TV count, washing machine presence and other appliance count. The target is **`Monthly_Usage_kWh`**.
 
-Flow: **Browser → Express → Python model → Express bill calculation → Browser**. Express invokes the local Python script using JSON over stdin/stdout; Python is not a separate API server.
+Customer ID, current/previous bill amounts, previous usage and other unused fields are excluded. The model cannot see the consumption target as an input. Bills are calculated using an editable flat **BDT/kWh** rate and monthly fixed charge. Dataset bill labels are not used for training.
 
-## API
+## PR12 requirements
 
-`GET /api/data` returns sample daily history and the training report.
-
-`POST /api/predict` accepts:
-
-```json
-{
-  "history": [12, 13, 11, 14, 12, 15, 13, 12, 14, 13, 11, 15, 12, 14, 13, 12, 15, 14, 12, 13, 11, 14, 12, 13, 15, 12, 14, 13],
-  "lastDate": "2010-11-25",
-  "days": 30,
-  "rate": 7,
-  "fixedCharge": 100
-}
-```
-
-It returns daily predictions, total kWh, and the energy charge, fixed charge and total bill. Invalid inputs return HTTP 400. The single-user demo permits one prediction at a time and returns 503 while busy.
-
-## Syllabus coverage
-
-| PR12 requirement | Implementation |
+| Requirement | Implementation |
 | --- | --- |
-| Problem definition | Forecast household electricity usage and estimate its cost |
-| Dataset collection | One included CSV derived from Kaggle, with source attribution |
-| Data preprocessing | Missing values, date sorting, duplicate removal, feature engineering and chronological split |
-| Model development | Two regression models and a persistence baseline |
-| Performance evaluation | MAE, RMSE, R² and recursive forecast evaluation |
-| Model optimization | Grid Search and time-series cross-validation; before/after metrics |
-| Result analysis and documentation | Dashboard results, generated report and project write-up |
+| Problem definition | Estimate household monthly kWh and its cost from household details |
+| Dataset collection | One included, attributed Kaggle CSV |
+| Data preprocessing | Duplicate removal, numeric cleaning, training-fitted imputation, scaling and one-hot encoding |
+| Model development | Ordinary least-squares Linear Regression baseline |
+| Performance evaluation | 800/200 household split; MAE, MSE, RMSE and R2 |
+| Model optimization | Five-fold GridSearchCV for intercept and nonnegative-coefficient settings |
+| Analysis and documentation | Base/tuned metrics, actual-versus-predicted plot, tuning conclusion and project write-up |
 
-## Limits
+All preprocessing is inside the model pipeline and is refitted inside each CV fold. Test data never chooses parameters. The saved model remains fitted on the 800 training households, so its evaluation corresponds to the reported test results. Tuning retains the baseline if no CV improvement occurs.
 
-The data is from **one French household, 2006–2010**; this is a historical forecasting demonstration, not a model validated across Indian homes. Entering your readings does not retrain it. Consumption is predicted by ML; the bill is calculated from your tariff. The default rupee rate is illustrative and does not include slabs, taxes, subsidies or provider-specific rules. Fixed charges apply once to the selected period. Longer forecasts accumulate error, and real-world savings or billing accuracy are not guaranteed.
+Accuracy, precision and recall are **secondary high-usage classification scores**, derived by comparing actual/predicted monthly kWh with the median training consumption. They are not regression accuracy; R2 is not a percentage of correct predictions.
 
-The local environment and installed dependencies are excluded from Git. Credit: Georges Hebrail and Alice Berard, EDF R&D; see `data/README.md` for the CSV's source and preparation details.
+## Files
+
+- `ml/preprocess.py`: dataset cleaning, input columns and preprocessing pipeline.
+- `ml/train.py`: baseline training, optimization, evaluation and export.
+- `ml/predict.py`: saved-pipeline prediction for Express.
+- `ml/plot_metrics.py`: Matplotlib evaluation graphs.
+- `server/`: Express API and simple bill formula.
+- `public/`: household form, results and graphs.
+- `docs/PROJECT.md`: all seven syllabus stages explained.
+- `docs/RESULTS.md`: actual results, updated by training.
+
+`GET /api/data` returns model results, input schema and a sample household. `POST /api/predict` accepts `{ household: {...}, rate: 8, fixedCharge: 100 }` and returns monthly kWh and a bill breakdown. Required household fields are listed in the returned schema. The single-user demo handles one prediction at a time.
+
+## Limitations
+
+This is a monthly estimate for a household profile, not a dated usage forecast. Results describe this dataset and split; real households may differ. Inputs outside the training distribution can be unreliable. The flat tariff is illustrative and omits provider-specific slabs, taxes and subsidies.

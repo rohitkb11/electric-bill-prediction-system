@@ -1,17 +1,18 @@
-"""JSON stdin/stdout bridge called by Express; never accept a user-supplied model."""
+"""Read household features from Express and return monthly kWh."""
 import json
 import sys
-from pathlib import Path
 import joblib
-from features import forecast
+import pandas as pd
+from preprocess import ROOT, FEATURES
 
-ROOT = Path(__file__).resolve().parents[1]
 
 def main():
     request = json.load(sys.stdin)
+    row = pd.DataFrame([{name: request[name] for name in FEATURES}])
     model = joblib.load(ROOT / "models/consumption.joblib")
-    result = forecast(model, request["history"], request["last_date"], request["days"])
-    print(json.dumps({"predictions": result}))
+    monthly_kwh = max(0.0, float(model.predict(row)[0]))
+    print(json.dumps({"monthlyKwh": round(monthly_kwh, 2)}))
+
 
 if __name__ == "__main__":
     main()

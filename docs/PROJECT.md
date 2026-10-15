@@ -1,54 +1,63 @@
-# Mini-project explanation
+# AI/ML Mini Project: Household Electricity and Bill Prediction
 
-## Problem definition
+## 1. Problem Definition
 
-Households need an estimate of upcoming energy use and its cost. Given consecutive daily electricity readings, predict consumption for the next 7â€“30 days and convert that prediction into an estimated bill using an editable rate and fixed charge.
+Estimate a household's monthly electricity consumption from details a user can provide: location, area type, family size, rooms and appliances. Calculate an estimated monthly bill from predicted kWh and a user-entered tariff. This is supervised regression, not time-series forecasting or direct prediction of the dataset's bill column.
 
-## Dataset and preprocessing
+## 2. Dataset Collection
 
-The project uses one dataset, `data/daily.csv`, with 1,440 daily records and three columns: `date`, `kwh` and `imputed`. Both training and the dashboard read this same CSV. Its values were derived from Kaggle/UCI Individual Household Electric Power Consumption; it is an attributed daily adaptation, not a separate original Kaggle dataset. No raw TXT or ZIP is needed.
+Use the single included `data/household_electricity.csv`, downloaded from Kaggle's Electricity Bill Prediction dataset by Arman Ahmed Taief. It contains 1,000 Bangladesh household records and 19 columns. The listed license is CC0. The original file was renamed without altering its column structure. The publisher does not document the data collection/generation method.
 
-During original CSV preparation, minute-level kW readings were summed and divided by 60 to give daily kWh. Days with at least 90% valid readings were normalized for coverage; other days used the preceding seven-day median. These assumptions can introduce error. The training script now reads the CSV directly, sorts dates, removes duplicate dates and handles additional invalid/missing readings. Imputed days supply history but are excluded as training/evaluation targets.
+Use 11 input features: Location, Area_Type, Household_Size, Rooms, AC_Units, Fan_Count, Light_Count, Refrigerator, TV_Count, Washing_Machine and Other_Appliances. The target is Monthly_Usage_kWh. Refrigerator and washing machine are presence flags; the other appliance values are counts.
 
-Features are usage 1, 7 and 14 days ago, seven- and 28-day averages, seven-day standard deviation, and cyclical weekday/month values. Every usage feature is computed strictly from the past. Linear Regression uses standardized features; tree models do not require scaling.
+Do not use Customer_ID, bill amounts or the current consumption target as inputs. Previous usage, temperature, meter type and tariff category are also omitted because the intended form uses household profile details only. This avoids requiring unavailable history and keeps the workflow simple.
 
-## Development, evaluation and optimization
+## 3. Data Preprocessing
 
-Two models are compared: Linear Regression and Random Forest Regressor. A previous-day prediction provides a simple baseline. Random Forest uses bagging: each tree trains on a bootstrap sample (sampling rows with replacement), and the forest averages tree predictions. `bootstrap=True` makes this explicit; `max_features="sqrt"` also selects random feature subsets at each split. The time-ordered data is divided into training, validation and testing periods. Model parameters are tuned only within training using four time-series folds. Validation MAE determines the retained settings and winning model. The test period does not determine selection.
+`ml/preprocess.py` reads the CSV, removes exact duplicates, coerces invalid numeric values to missing and trims categorical strings. Rows with invalid targets are removed; features with missing values are retained for imputation.
 
-MAE describes average absolute error in kWh; MSE is mean squared error in kWh², and RMSE is its square root. R² compares prediction errors with a constant mean predictor and can be negative. The dashboard shows real generated values; a complex model is not assumed to outperform the baseline.
+Split into 800 training and 200 test households with random seed 42. There is no date-based forecasting task here. Inside each model pipeline, numeric missing values are filled with training medians and standardized. Categorical missing values use the training mode, then location/area are one-hot encoded with one reference category dropped. The complete pipeline is refitted inside every training CV fold. Test rows never fit preprocessing or choose hyperparameters.
 
-`ml/plot_metrics.py` uses Matplotlib to plot test MSE and R² for both models. A separate graph compares accuracy, precision and recall for derived high-usage detection. A day is high usage when its kWh is at least the median observed training consumption; the same training-only threshold labels actual test values and regression predictions. Accuracy measures correct high/normal labels; precision measures how many predicted-high days were actually high; recall measures how many actual-high days were detected. These are secondary classification scores, not regression accuracy. No additional classifier is trained. Undefined precision/recall values are set to zero.
+The supplied dataset currently has no missing feature values, invalid targets or exact duplicate records; the cleaning steps remain for reproducibility if those issues arise.
 
-Next-day evaluation has actual earlier readings available. For the 30-day evaluation, each predicted value is fed into the following day's features. The report includes complete, non-imputed 30-day windows in the held-out test period. These metrics better represent a multi-day forecast. After evaluation, the selected model is fitted on all observed dates for the interactive demo.
+## 4. Model Development
 
-## Application and bill calculation
+Use ordinary least-squares Linear Regression. It estimates monthly kWh as an intercept plus a weighted sum of the transformed inputs. This model was chosen after an earlier household-data comparison showed lower CV and test error than Random Forest. The active pipeline now contains only Linear Regression.
 
-Express serves the frontend and exposes two endpoints: one for dataset/model information and one for predictions. The prediction endpoint validates the inputs and invokes Python's saved model. The bill is `total predicted kWh Ã— rate + one fixed charge`, rounded to two decimals. No model is trained to predict a bill because the dataset contains no bill labels.
+The saved `models/consumption.joblib` includes both preprocessing and the regressor. `ml/predict.py` loads it and accepts the same feature names used during training. Express validates the form inputs and calls this script. Negative extrapolated consumption is clipped to zero consistently during evaluation and prediction.
 
-## Results and conclusion
+## 5. Performance Evaluation
 
-See `models/report.json` and the dashboard for actual model scores, chosen settings and forecast results. Discuss the baseline comparison, whether tuning improved validation, and the gap between one-day and 30-day results. The demonstration supports all seven PR12 stages, while remaining small enough to explain in a practical examination.
+Evaluate monthly kWh on the same 200 held-out test households for base and tuned variants:
 
-The principal limitations are one-household historical data, missing weather/occupancy information, recursive prediction error and a simplified tariff. A more representative multi-household dataset and verified utility tariffs would be needed before applying it to real billing.
+- MAE: average absolute error in kWh.
+- MSE: mean squared error in kWh squared.
+- RMSE: square root of MSE, in kWh; penalizes larger errors.
+- R2: variation explained compared with a constant predictor; not a percentage of correct predictions.
 
-## Recorded run
+Matplotlib generates base/tuned MSE and R2 graphs, an actual-versus-predicted scatter plot, and a separate high-usage classification graph. The high-usage threshold is the median observed training consumption, applied to actual and predicted monthly values. Accuracy, precision and recall describe those derived high/normal labels; they are not regression accuracy. Undefined precision/recall is reported as zero.
 
-Trained directly from 1,440 CSV daily records, including 22 flagged filled days excluded as targets. Selected **Random Forest**.
+## 6. Model Optimization
 
-| Model | Test MAE (kWh) | Test RMSE (kWh) | Test R2 |
-| --- | --- | --- | --- |
-| Linear Regression | 4.199 | 5.466 | 0.441 |
-| Random Forest | 3.834 | 5.198 | 0.494 |
-| Previous-day baseline | 4.564 | 6.525 | 0.203 |
+Use GridSearchCV with five shuffled training folds and MAE scoring. Evaluate all four combinations of `fit_intercept` (True/False) and `positive` (True/False). The latter optionally constrains fitted coefficients to be nonnegative; it is not assumed to help. Preprocessing is inside the searched pipeline.
 
-Selected model validation MAE changed from 4.524 to 4.467 kWh after tuning. Recursive 30-day test MAE was 4.394 kWh across 5 complete windows. This is daily error within those forecasts, not monthly bill error.
+Keep the baseline unless the best training CV MAE is strictly lower. For the supplied data, the search chooses the original settings: `fit_intercept=True`, `positive=False`. CV MAE remains 21.7772 kWh. This is a completed optimization experiment with no observed improvement, not an artificial performance gain.
 
-## Matplotlib model comparison
+The saved model stays fitted on the 800 training households, matching its held-out evaluation. Training does not refit the selected model on the test set.
 
-| Model | Test MSE (kWh squared) | Test R2 | High-usage accuracy | High-usage precision | High-usage recall |
-| --- | --- | --- | --- | --- | --- |
-| Linear Regression | 29.883 | 0.441 | 76.73% | 68.18% | 63.38% |
-| Random Forest | 27.022 | 0.494 | 77.23% | 68.12% | 66.20% |
+## 7. Result Analysis and Documentation
 
-High usage is defined using the training median (25.305633 kWh). Random Forest has lower MSE and higher R2 on this held-out test, so it performs better for consumption regression here. It also has slightly higher high-usage accuracy and recall; Linear Regression has slightly higher precision. These results are specific to this dataset and split.
+See `docs/RESULTS.md` for actual baseline/tuned results, automatically updated by training. Full results and all tuning candidates are in `models/report.json`. The 200 actual/predicted pairs are in `models/test_predictions.json`. Graphs are in `public/plots/` and are displayed on the dashboard.
+
+The current result is MAE 21.5988 kWh, MSE 724.3373, RMSE 26.9135 kWh and R2 0.9402. Baseline and tuned metrics are equal because tuning selected the same settings. Results apply to this dataset and split, not independently validated household billing accuracy.
+
+The bill formula is `predicted monthly kWh * rate + monthly fixed charge`, in BDT. It is separate from the consumption model and does not implement provider-specific slabs, taxes or subsidies. Bangladesh locations and the undocumented collection method limit generalization. More representative measured data would be needed for real deployment.
+
+## Reproduce
+
+```powershell
+.\.venv\Scripts\python.exe ml/train.py
+npm.cmd test
+.\.venv\Scripts\python.exe -m unittest discover -s tests -p test_model.py
+npm.cmd start
+```

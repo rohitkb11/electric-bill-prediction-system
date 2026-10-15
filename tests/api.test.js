@@ -1,47 +1,48 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { app, validateForecast } from '../server/app.js';
+import { app, validateInput } from '../server/app.js';
 import { calculateBill } from '../server/bill.js';
 
-const input = { history: Array(28).fill(12), lastDate: '2010-11-25', days: 7, rate: 7, fixedCharge: 100 };
-let server, base;
+let server, base, report, input;
 before(async () => {
   server = app.listen(0, '127.0.0.1');
   await new Promise(resolve => server.once('listening', resolve));
   base = `http://127.0.0.1:${server.address().port}`;
+  report = (await (await fetch(`${base}/api/data`)).json()).report;
+  input = { household: report.sample_input, rate: 8, fixedCharge: 100 };
 });
 after(() => new Promise(resolve => server.close(resolve)));
 
-test('bill uses energy charge plus one fixed charge', () => {
-  assert.deepEqual(calculateBill(100.25, 7, 100), { energyCharge: 701.75, fixedCharge: 100, total: 801.75 });
-  assert.equal(calculateBill(0, 7, 100).total, 100);
+test('bill uses monthly consumption and one fixed charge', () => {
+  assert.deepEqual(calculateBill(100.25, 8, 100), { energyCharge: 802, fixedCharge: 100, total: 902 });
+  assert.equal(calculateBill(0, 8, 100).total, 100);
 });
-test('validates daily history, dates, horizon and tariff', () => {
-  assert.deepEqual(validateForecast(input), input);
-  for (const bad of [{ history: Array(27).fill(1) }, { history: [...Array(27).fill(1), -1] },
-    { history: [...Array(27).fill(1), null] }, { lastDate: '2010-02-30' }, { days: 31 },
-    { days: 1.5 }, { rate: -1 }, { fixedCharge: '100' }]) {
-    assert.throws(() => validateForecast({ ...input, ...bad }));
+test('validates household features, supported locations and tariffs', () => {
+  assert.deepEqual(validateInput(input), input);
+  for (const change of [{ Household_Size: 0 }, { Fan_Count: -1 }, { Rooms: 1.5 },
+    { Refrigerator: 2 }, { Location: 'Unknown city' }, { TV_Count: null }]) {
+    assert.throws(() => validateInput({ ...input, household: { ...input.household, ...change } }));
   }
+  assert.throws(() => validateInput({ ...input, rate: -1 }));
+  assert.throws(() => validateInput({ ...input, fixedCharge: '100' }));
 });
-test('serves dashboard and real dataset report', async () => {
+test('serves the household form and Linear Regression report', async () => {
   const page = await fetch(base);
   assert.equal(page.status, 200);
-  assert.match(await page.text(), /Electric Bill Prediction System/);
-  const res = await fetch(`${base}/api/data`);
-  assert.equal(res.status, 200);
-  const data = await res.json();
-  assert.equal(data.history.length, 90);
-  assert.equal(data.report.statistics.daily_rows, 1440);
-  assert.deepEqual(data.report.models.map(model => model.name), ['Linear Regression', 'Random Forest']);
-  for (const model of data.report.models) {
-    assert.ok(model.test.mse >= 0);
-    assert.ok(Math.abs(model.test.mse - model.test.rmse ** 2) < 0.002);
+  assert.match(await page.text(), /Your household/);
+  assert.equal(report.statistics.usable_rows, 1000);
+  assert.equal(report.split.training_rows, 800);
+  assert.equal(report.split.test_rows, 200);
+  assert.equal(report.selected_model, 'Linear Regression');
+  assert.equal(report.optimization.candidates.length, 4);
+  assert.deepEqual(report.models.map(model => model.name), ['Base Linear Regression', 'Tuned Linear Regression']);
+  for (const model of report.models) {
+    assert.ok(Math.abs(model.test.mse - model.test.rmse ** 2) < 0.01);
     for (const score of Object.values(model.high_usage_test)) assert.ok(score >= 0 && score <= 1);
   }
 });
-test('serves Matplotlib comparison plots as PNG images', async () => {
-  for (const name of ['regression-comparison', 'high-usage-comparison']) {
+test('serves three Matplotlib evaluation plots as PNG images', async () => {
+  for (const name of ['regression-comparison', 'high-usage-comparison', 'actual-vs-predicted']) {
     const response = await fetch(`${base}/plots/${name}.png`);
     assert.equal(response.status, 200);
     assert.match(response.headers.get('content-type'), /image\/png/);
@@ -49,19 +50,15 @@ test('serves Matplotlib comparison plots as PNG images', async () => {
     assert.deepEqual([...bytes.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
   }
 });
-test('rejects invalid prediction input with helpful JSON', async () => {
+test('rejects missing household inputs with helpful JSON', async () => {
   const response = await fetch(`${base}/api/predict`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
   assert.equal(response.status, 400);
-  assert.match((await response.json()).error, /28/);
+  assert.match((await response.json()).error, /Family members/);
 });
-test('Express calls Python model and returns a consistent bill', async () => {
-  const data = await (await fetch(`${base}/api/data`)).json();
-  const response = await fetch(`${base}/api/predict`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...input, history: data.history.slice(-28).map(r => r.kwh), lastDate: data.history.at(-1).date, days: 30 }) });
+test('Express calls the saved Linear Regression pipeline and calculates the bill', async () => {
+  const response = await fetch(`${base}/api/predict`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input) });
   assert.equal(response.status, 200);
   const result = await response.json();
-  assert.equal(result.predictions.length, 30);
-  assert.equal(result.predictions[0].date, '2010-11-26');
-  assert.ok(result.predictions.every(r => Number.isFinite(r.kwh) && r.kwh >= 0));
-  assert.equal(result.bill.total, calculateBill(result.totalKwh, input.rate, input.fixedCharge).total);
+  assert.ok(Number.isFinite(result.monthlyKwh) && result.monthlyKwh >= 0);
+  assert.equal(result.bill.total, calculateBill(result.monthlyKwh, input.rate, input.fixedCharge).total);
 });
